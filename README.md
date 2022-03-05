@@ -4,4 +4,9 @@
 A statistical driven python library for your data science cleaning needs
 
 
+# Build the Library
+The three mandatory parameters are name, version and packages. You can now build the library with the following.
+python setup.py sdist bdist_wheel
+
+
 
