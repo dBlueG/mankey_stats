@@ -11,26 +11,8 @@ class Ordinal_Transformer(BaseEstimator, TransformerMixin):
         super().__init__()
         self.dict_ = {}
 
-    def _woe_cal(self, input, target) -> pd.DataFrame:
-        df = self.df
-        # Define a binary target: duration >= 24
-        # df['binary_target'] = (df.Duration >= 24).astype(int)
-        woe_df = pd.DataFrame(df.groupby(input, as_index = False)[target].mean())
-        woe_df = woe_df.rename(columns={target: 'positive'})
-        woe_df['negative'] = 1 - woe_df['positive']
 
-        # Cap probabilities to avoid zero division
-        woe_df['positive'] = np.where(
-            woe_df['positive'] < 1e-6, 1e-6, woe_df['positive'])
-        woe_df['negative'] = np.where(
-            woe_df['negative'] < 1e-6, 1e-6, woe_df['negative'])
-
-        woe_df['WoE'] = np.log(woe_df['positive'] / woe_df['negative'])
-        woe_dict = woe_df['WoE'].to_dict()
-
-        return woe_df
-
-    def fit(self, X: pd.DataFrame, y: pd.Series, target_name: str, input_vars=[],   num_cat_threshold=5):
+    def fit(self, class_order_dict, X: pd.DataFrame, y = None, input_vars=[]):
         
         self.df = X
         self.input_vars = input_vars
@@ -60,7 +42,7 @@ class Ordinal_Transformer(BaseEstimator, TransformerMixin):
         input_vars = self.input_vars
         for var_name in input_vars:
             X[var_name+"_woe"] = 0
-            
+            print(var_name)
             for line in range(len(self.dict_[var_name])):
                 
                 X[var_name+"_woe"] = np.where(X[var_name] == self.dict_[var_name].loc[line,var_name], self.dict_[var_name].loc[line,"WoE"], X[var_name+"_woe"])
