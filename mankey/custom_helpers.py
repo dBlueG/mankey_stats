@@ -1,5 +1,5 @@
-from msilib.schema import Error
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import OrdinalEncoder
 import pandas as pd
 import numpy as np
 
@@ -7,47 +7,46 @@ import numpy as np
 # Ordinal transformer
 
 class Ordinal_Transformer(BaseEstimator, TransformerMixin):
+
+    ord_enc = []
     def __init__(self):
         super().__init__()
         self.dict_ = {}
+        
+        
 
 
     def fit(self, class_order_dict, X: pd.DataFrame, y = None, input_vars=[]):
         
         self.df = X
-        self.input_vars = input_vars
-        self.df['target'] = y
-
-        # check target is binary, otherwise raise error
-       
         
-        if(y.nunique() != 2):
-            return "WoE implementation only supports binary targets"
-                
         
+        #make sure we have the same columns as input_vars
+        #if list(X.columns)!=input_vars:
+        #    return("Columns do not match")
+            
+        self.features_transform = []
+        self.feature_levels = []
+        for feature in class_order_dict:
+            self.features_transform.append(feature)
+            self.feature_levels.append(class_order_dict[feature])
 
-        # calculate woe for each categorical variable and store it in the instance attributes
-        # ln(#bad / #good) per class
-        for var_name in input_vars:
-            if(X[var_name].nunique() >= num_cat_threshold):
-                woe_df = self._woe_cal(var_name, target_name)
-                self.dict_[var_name] = woe_df
-            else:
-                self.input_vars.remove(var_name)
+        X_limited = X[self.features_transform]
+        self.ord_enc = OrdinalEncoder(categories=self.feature_levels)
+        self.ord_enc.fit(X_limited)
 
         return self
 
     def transform(self, X, y=None):
 
-        input_vars = self.input_vars
-        for var_name in input_vars:
-            X[var_name+"_woe"] = 0
-            print(var_name)
-            for line in range(len(self.dict_[var_name])):
-                
-                X[var_name+"_woe"] = np.where(X[var_name] == self.dict_[var_name].loc[line,var_name], self.dict_[var_name].loc[line,"WoE"], X[var_name+"_woe"])
-
-            X.drop(var_name, axis = 1, inplace = True)
+        if(not self.ord_enc):
+            return("you must fit first")
+        
+        X_limited = X[self.features_transform]
+        X_limited = self.ord_enc.transform(X_limited)
+        X_limited = X_limited.astype('int64')
+        X[self.features_transform] = X_limited
+        
         return X
 
 
