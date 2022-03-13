@@ -2,7 +2,39 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OrdinalEncoder
 import pandas as pd
 import numpy as np
+import datetime
 
+#Date transformer
+def date_expander(X, input_var=[], date_format = 'YYYY-MM-DD'):
+    """
+    Expands a date series/or dataframe with date columns into a new data frame with 
+    five columns for each date: day of the week, month of the year, day of month, days till due date (need reference date),
+    and the year.
+    
+
+    Parameters
+    ----------
+        X: dataframe or series
+        input_var: list of feature names containing dates
+        date_format: how the date is formated in the data (YYYY-MM-DD or MM-DD-YYYY or DD-MM-YYYY are implemented)
+    Returns
+    -------
+        A new dataframe with expanded date information (see description)
+
+    """
+
+
+def date_expand_func(year, month, day, ref_date: datetime.date):
+    dt = datetime.date(year,month, day)
+    
+    day_of_month = dt.strftime("%d")
+    month_of_year = dt.strftime("%m")
+    year = dt.strftime("%Y")
+    day_of_week = dt.strftime("%w")
+
+    delta = dt - ref_date
+    days_remaining = abs(delta.days)
+    return(year, month_of_year, day_of_month, day_of_week, days_remaining)
 
 # Ordinal transformer
 
@@ -32,7 +64,8 @@ class Ordinal_Transformer(BaseEstimator, TransformerMixin):
             self.feature_levels.append(class_order_dict[feature])
 
         X_limited = X[self.features_transform]
-        self.ord_enc = OrdinalEncoder(categories=self.feature_levels)
+        # if the test set does not have the category... do not fail!!
+        self.ord_enc = OrdinalEncoder(categories=self.feature_levels, handle_unknown="use_encoded_value", unknown_value= -1)
         self.ord_enc.fit(X_limited)
 
         return self
