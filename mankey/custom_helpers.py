@@ -104,7 +104,6 @@ class Ordinal_Transformer(BaseEstimator, TransformerMixin):
 
         if(not self.ord_enc):
             return("you must fit first")
-
         X_limited = X[self.features_transform]
         X_limited = self.ord_enc.transform(X_limited)
         X_limited = X_limited.astype('int64')
@@ -139,7 +138,6 @@ class WoE_Transformer(BaseEstimator, TransformerMixin):
         return woe_df
 
     def fit(self, X: pd.DataFrame, y: pd.Series, target_name: str, input_vars=[],   num_cat_threshold=5):
-
         self.df = X
         self.input_vars = input_vars
         self.df['target'] = y
