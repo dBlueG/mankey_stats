@@ -13,6 +13,7 @@ Durrah Alzamil
 Basil Alfakher
 """
 
+from os import stat
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,10 +25,13 @@ import numpy as np
 import plotly.offline as py
 import plotly.figure_factory as ff
 import plotly.graph_objs as gobj
+from sklearn.model_selection import train_test_split
 
 import custom_helpers
+import stats_helpers
+import charting_helper
 
-class MankeyDataframe(pd.DataFrame):
+class MankeyDataFrame(pd.DataFrame):
     """
     The class is used to extend the properties of Dataframes through providing 
     statistical based and robust functions. 
@@ -35,6 +39,13 @@ class MankeyDataframe(pd.DataFrame):
     
     It facilitates the End User to perform some Date Feature Engineering,
     Scaling, Encoding, etc. to avoid code repetition.
+
+    Example instantiation:
+
+    import pandas as pd
+    csv_list = pd.read_csv("list_stuff.csv")
+    mdf = MankeyDataFrame(csv_list)
+
     """
 
     #Initializing the inherited pd.DataFrame
@@ -44,7 +55,7 @@ class MankeyDataframe(pd.DataFrame):
     @property
     def _constructor(self):
         def func_(*args,**kwargs):
-            df = MankeyDataframe(*args,**kwargs)
+            df = MankeyDataFrame(*args,**kwargs)
             return df
         return func_
     
@@ -82,132 +93,131 @@ class MankeyDataframe(pd.DataFrame):
                         # SUPERVISED - BINARY CLASSIFICATION - DATA CLEANING
 #-----------------------------------------------------------------------------    
 
-    def plot_categorical(self, df,col_name):
-        data = df
-        values_count = pd.DataFrame(data[col_name].value_counts())
-        values_count.columns = ['count']
-        values_count[col_name] = [ str(i) for i in values_count.index ]
-        values_count['percent'] = values_count['count'].div(values_count['count'].sum()).multiply(100).round(2)
-        values_count = values_count.reindex([col_name,'count','percent'],axis=1)
-        values_count.reset_index(drop=True,inplace=True)
-        font_size = 10
-        trace = gobj.Bar( x = values_count[col_name], y = values_count['count'], marker = {'color':'#FFAA00'})
-        data_ = gobj.Data( [trace] )
-        annotations0 = [ dict(x = xi,
-                                y = yi,
-                                showarrow=False,
-                                font={'size':font_size},
-                                text = "{:,}".format(yi),
-                                xanchor='center',
-                                yanchor='bottom' )
-                        for xi,yi,_ in values_count.values ]
-        annotations1 = [ dict( x = xi,
-                                y = yi/2,
-                                showarrow = False,
-                                text = "{}%".format(pi),
-                                xanchor = 'center',
-                                yanchor = 'middle',
-                                font = {'color':'#FF27C1'})
-                            for xi,yi,pi in values_count.values if pi > 10 ]
-        annotations = annotations0 + annotations1
-        layout = gobj.Layout( title = col_name.replace('_',' ').capitalize(),
-                                titlefont = {'size': 50},
-                                yaxis = {'title':'count'},
-                                xaxis = {'type':'category'},
-                                annotations = annotations,
-                                plot_bgcolor = '#FFF8EC')
-        figure = gobj.Figure( data = data_, layout = layout )
-        py.iplot(figure)
 
-    def plot_numerical(self, df, col_name):
-        data = df
-        series = data[col_name]
-        smin,smax = series.min(),series.max()
-        percentiles = [ np.percentile(series,n) for n in (2.5,50,97.5) ]
-        trace0 = gobj.Histogram( x = series,
-                                histfunc = 'avg',
-                                histnorm = 'probability density',
-                                opacity=.75,
-                            marker = {'color':'#FFAA00'})
-        data_ = gobj.Data( [trace0] )
-        shapes = [{ 'line': { 'color': '#AA00AA', 'dash':'dot', 'width':2 },
-                    'type':'line',
-                    'x0':percentiles[0], 'x1':percentiles[0], 'xref':'x',
-                    'y0':-0.1, 'y1':1, 'yref':'paper' },
-                { 'line': { 'color': '#AA00AA', 'dash':'dot', 'width':1 },
-                    'type':'line',
-                    'x0':percentiles[1], 'x1':percentiles[1], 'xref':'x',
-                    'y0':-0.1, 'y1':1, 'yref':'paper' },
-                { 'line': { 'color': '#AA00AA', 'dash':'dot', 'width':2 },
-                    'type':'line',
-                    'x0':percentiles[2], 'x1':percentiles[2], 'xref':'x',
-                    'y0':-0.1, 'y1':1, 'yref':'paper' }
-                ]
-        annotations = [ {'x': percentiles[0], 'xref':'x','xanchor':'right',
-                        'y': .3, 'yref':'paper',
-                        'text':'2.5%', 'font':{'size':10},
-                        'showarrow':False},
-                        {'x': percentiles[1], 'xref':'x','xanchor':'center',
-                        'y': .2, 'yref':'paper',
-                        'text':'95%<br>median = {0:,.2f}<br>mean = {1:,.2f}<br>min = {2:,}<br>max = {3:,}'
-                            .format(percentiles[1],series.mean(),smin,smax),
-                        'showarrow':False,
-                        'font':{'size':10} },
-                        {'x': percentiles[2], 'xref':'x','xanchor':'left',
-                        'y': .3, 'yref':'paper',
-                        'text':'2.5%','font':{'size':10},
-                        'showarrow':False}
-                    ]
-        layout = gobj.Layout( title = col_name,
-                            yaxis = {'title':'Probability/Density'},
-                            xaxis = {'title':col_name, 'type':'linear'},
-                            shapes = shapes,
-                            annotations = annotations,
-                            plot_bgcolor = '#FFF8EC'
-                            )
-        figure = gobj.Figure(data = data_, layout = layout)
-        py.iplot(figure)
 
-    def plot_univariate(self, df, cols = []):
-        if len(cols) == 0:
-            data = df
-        else:
-            data = df[cols]
-        for col in data.columns:
-            if is_numeric_dtype(df[col]):
-                self.plot_numerical(data, col)
-            elif is_object_dtype(df[col]):
-                self.plot_categorical(data,col)
+    def plot_charts(self, input_vars = [], force_categorical=['BINARIZED_TARGET']):
+        charting_helper.plot_univariate(self, cols = input_vars, force_categorical=force_categorical)
     
-    def cleaning_missing(self, input_vars=[] ):
+    def explore_stat(self, input_vars=[], normal_test_alpha=0.05, grubbs_alpha=0.05, grubbs_max_outliers=20, iqr_factor=2.5):
         """
-        TO BE IMPLEMENTED: data cleaning (provide methods for data scanning and cleaning, 
-            for example: scan each column, indicating if droping or keeping the variable for 
-            modelling and why, for the ones keeping indicates which cleaning / transformation 
-            is recommended for the missing values and if scalling / dummy creation is recommended, 
-            if not always inform that is not necessary);
+        This method describes the dataset per feature, for numeric fields several statistics are 
+        calculated including skew, kurtosis, normality test, missing value, and quartiles.
+        This also includes grubbs test for outliers
+
+        Parameters
+        ----------
+        input_vars: list of columns (to limit the evaluation to certain features only)
+        normal_test_alpha: alpha value to be used for the normality test
+        grubbs_alpha: alpha value for the grubbs outlier test
+        grubbs_max_outliers: how many outliers to look for
+        iqr_factor: IQR factor to determine outlier
+
+        Returns
+        -------
+        None.
+        """
+        df_analyze = self.copy()
+        if(input_vars):
+            df_analyze = df_analyze.loc[:,input_vars]
+        
+        return stats_helpers.eval_df(df_analyze)
+
+    def create_train_test_sets(self, target_var, input_vars = [], test_size = 0.2, random_state = 42):
+        """
+        Divide the dataframe into two sets (training and test) to be used to ML models
+        
+        Parameters
+        ----------
+        input_vars: list of columns (to limit the sets to only certain fields)
+        target_var: name of the feature containing the ML target (to be used for y)
+        Returns
+        -------
+          Training and Test data sets including X and y (target) 
+          (X_train, y_train, X_test, y_test)
+
+        """
+
+        X = self.loc[:, self.columns != target_var]
+        y = self[target_var]
+
+        if(input_vars):
+            X = X.loc[:,input_vars]
+        
+        
+
+        # split into input and output elements
+        X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=test_size, 
+                                                            random_state=random_state) 
+        
+        return (X_train, X_test, y_train, y_test)
+
+    
+    def cleaning_missing(self, X_train, y_train, X_test, y_test, target_var, input_vars=[], print_only = True ):
+        """
+        Using the statistical tests from the explore_stat method, this method performs handling of 
+        missing data imputation and/or removal of the feature (as per user preferences).
+        The method can be run in simulation mode or active mode, in simulation, only the recommended transformations
+        will be highlighted but the data is not modified.
+        
+        Parameters
+        ----------
+        input_vars: list of columns (to limit the evaluation to certain features only)
+        print_only: only print an analysis of the findings
+
         Returns
         -------
           A print with the analysis or new clean columns .
 
         """
-        return "To be implemented."
+        df_train = X_train.copy()
+        df_train[target_var] = y_train
+
+        df_test = X_test.copy()
+        df_test[target_var] = y_test
+
+        if(print_only):
+           
+            (descriptive_statistics, logic_prep, _) = stats_helpers.eval_df(df_train)
+            print("Training set")
+            print(logic_prep)
+            print("===============")
+            print(descriptive_statistics)
+
+            (descriptive_statistics, _, _) = stats_helpers.eval_df(df_test)
+            print("===============")
+            print("Test set stats")
+            print(descriptive_statistics)
+
+        else:
+            return stats_helpers.clean_data(df_train, df_test)
+
+        
     
  
-    def recommended_transformation(self, X_train, y_train, X_test, y_test, input_vars=[],  target='', ordinal_var = [], woe_cat_threshold=5, print_only = True):
+    def recommended_transformation(self, X_train, y_train, X_test, y_test, target_var, input_vars=[],  ordinal_var = {}, woe_cat_threshold=5, print_only = True):
         """
+        This method can be used to recommend and/or apply transformations including:
+        impute missing values, date manipulations, categorical variable handling (dummy/WoE/ordinal).
 
-        TO BE IMPLEMENTED: data preparation (for each column provide methods to perform
-        transformations - for example: time calculation like age, days as customers, 
-        days to due date, label encoding, imputation, standard scalling, dummy creation 
-        or replacement of category value by its probability of default depending, justify 
-        transformation depending of the variable type, or explain why transformation is 
-        not necessary);
+        The method needs two sets (training and test) so that all transformation settings are based
+        on the training set but applied on the both sets.
 
+        Note: the method can be used to also print the transformations, without actually outputting new data
+       
         e.g. of specifying ordinal categories
         dictionary as follows: {"feature_name": [list of all classes IN ORDER from low (1) to high(# of classes)]}
         
-        
+        Parameters
+        ----------
+        input_vars: list of columns (to limit the evaluation to certain features only)
+        X_train: subset to be used for training
+        X_test: subset to be used for test
+        y_train: target output related to X_train
+        y_test: target output related to X_test
+        target_var: name of the feature containing the ML target (to be used for y)
+        woe_cat_threshold: the number of classes per category to determine whether WoE should be used for transformation
+        ordinal_var: dictionary for specifying ordinal categories as follows: {"feature_name": [list of all classes IN ORDER from low (1) to high(# of classes)]}
+        print_only: only print an analysis of the findings
 
         Returns
         -------
@@ -217,7 +227,7 @@ class MankeyDataframe(pd.DataFrame):
         remaining_vars = input_vars
 
 
-        ### categorical
+        # categorical
 
         
         #ordinal
