@@ -10,12 +10,128 @@
 ![alt text](https://www.pngfind.com/pngs/m/607-6079786_056-mankey-mankey-pokemon-hd-png-download.png)
 
 
-A statistical driven python library for your data science cleaning needs.
+Mankey_stats is a Python library that allows the user to quickly and efficiently perform data preparation techniques to transform the datasets for ML modeling, this is done through the utilization of Scikit-learn's fit() and transform() methods.
 
 
-# Build the Library
-### The three mandatory parameters are name, version and packages. You can now build the library with the following.
-python setup.py sdist bdist_wheel.
+## Documentation
+
+* [Documentation](https://mankey-stats.readthedocs.io/en/main/#)
 
 
+## Current mankey-stats's transformers include functionality for:
+
+* Datetime Feature Extraction
+* Ordinal Encoding
+* Weight of Evidence Calculation for Categorical Variables
+* Outlier Detection 
+* Outlier Removal
+* Missing Value handling recommendation
+* Feature Normality test
+* Variable Selection
+* Preprocessing
+* Scikit-learn Wrappers
+
+### Imputation Methods
+* Fill Null Values with Mean/Median
+
+### Encoding Methods
+* OneHotEncoder
+* OrdinalEncoder
+* WoEEncoder
+
+### Outlier Handling methods
+* Grubb's Test
+
+### Variable Transformation methods
+* MinMaxScaler
+* StandardScaler
+
+### Variable Creation:
+ * date_expander
+
+### Feature Selection:
+ * 
+
+### Datetime
+ * DatetimeFeatures
+ 
+### Preprocessing
+ * MatchVariables
+ 
+### Wrappers:
+ * SklearnTransformerWrapper
+
+## Installation
+
+From PyPI using pip:
+
+```
+pip install mankey_stats
+```
+
+From Anaconda:
+
+```
+conda install -c conda-forge mankey_stats
+```
+
+Or simply clone it:
+
+```
+git clone https://github.com/mankey_stats/mankey_stats.git
+```
+
+## Example Usage
+
+```python
+>>> import pandas as pd
+>>> from mankey_stats.ordinal_encoder as ordinal_encoder
+
+>>> data = {'type':  ['bad', 'average', 'good', 'very good', 'excellent'],
+            'level': [1, 2, 3, 4, 5]
+>>> data = pd.DataFrame(data)
+>>> print(data)
+```
+
+```
+Out[1]:
+type    level
+bad       1
+average   2
+good      3
+very good 4
+excellent 5  
+Name: var_A, dtype: int64
+```
+    
+```python 
+>>> ordinal_encoding = Oridnal_encoder()
+>>> data_encoded = ordinal_encoding(data)
+>>> print(data_encoded)
+```
+
+```
+Out[2]:
+0       1
+1       2
+2       3
+3       4
+4       5
+Name: var_A, dtype: int64
+```
+
+Find more in the [documentation](https://mankey-stats.readthedocs.io/en/main/#).
+
+### Documentation
+
+mankey-stats documentation is built using [Sphinx](https://www.sphinx-doc.org) and is hosted on [Read the Docs](https://readthedocs.org/).
+
+To build the documentation make sure you have the dependencies installed: from the root directory: ``pip install -r docs/requirements.txt``.
+
+Now you can build the docs using: ``sphinx-build -b html docs build``
+
+
+## License
+
+MIT
 
