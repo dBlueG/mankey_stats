@@ -10,133 +10,47 @@
 ![alt text](https://www.pngfind.com/pngs/m/607-6079786_056-mankey-mankey-pokemon-hd-png-download.png)
 
 
-A statistical driven python library for your data science cleaning needs.
-
-
-# Build the Library
-### The three mandatory parameters are name, version and packages. You can now build the library with the following.
-python setup.py sdist bdist_wheel.
-
-
-![PythonVersion](https://img.shields.io/badge/python-3.6%20|3.7%20|%203.8%20|%203.9-success)
-[![License https://github.com/feature-engine/feature_engine/blob/master/LICENSE.md](https://img.shields.io/badge/license-BSD-success.svg)](https://github.com/feature-engine/feature_engine/blob/master/LICENSE.md)
-[![PyPI version](https://badge.fury.io/py/feature-engine.svg)](https://badge.fury.io/py/feature-engine)
-[![Conda https://anaconda.org/conda-forge/feature_engine](https://anaconda.org/conda-forge/feature_engine/badges/installer/conda.svg)](https://anaconda.org/conda-forge/feature_engine)
-[![CircleCI https://app.circleci.com/pipelines/github/feature-engine/feature_engine?branch=1.1.X](https://img.shields.io/circleci/build/github/feature-engine/feature_engine)](https://app.circleci.com/pipelines/github/feature-engine/feature_engine?branch=1.1.X)
-[![Documentation Status https://feature-engine.readthedocs.io/en/latest/index.html](https://readthedocs.org/projects/feature-engine/badge/?version=latest)](https://feature-engine.readthedocs.io/en/latest/index.html)
-[![Join the chat at https://gitter.im/feature_engine/community](https://badges.gitter.im/feature_engine/community.svg)](https://gitter.im/feature_engine/community)
-[![Sponsorship https://www.trainindata.com/](https://img.shields.io/badge/Powered%20By-TrainInData-orange.svg)](https://www.trainindata.com/)
-[![Downloads](https://pepy.tech/badge/feature-engine)](https://pepy.tech/project/feature-engine)
-[![Downloads](https://pepy.tech/badge/feature-engine/month)](https://pepy.tech/project/feature-engine)
-[![DOI](https://zenodo.org/badge/163630824.svg)](https://zenodo.org/badge/latestdoi/163630824)
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.03642/status.svg)](https://doi.org/10.21105/joss.03642)
-
-
-[<img src="https://github.com/feature-engine/feature_engine/blob/main/docs/images/logo/FeatureEngine.png" width="248">](http://feature-engine.readthedocs.io)
-
-Feature-engine is a Python library with multiple transformers to engineer and select features for use in machine learning models. 
-Feature-engine's transformers follow Scikit-learn's functionality with fit() and transform() methods to learn the 
-transforming parameters from the data and then transform it.
-
-
-## Feature-engine features in the following resources
-
-* [Feature Engineering for Machine Learning, Online Course](https://www.udemy.com/course/feature-engineering-for-machine-learning/?referralCode=A855148E05283015CF06)
-
-* [Feature Selection for Machine Learning, Online Course](https://www.udemy.com/course/feature-selection-for-machine-learning/?referralCode=186501DF5D93F48C4F71)
-
-* [Deployment of Machine Learning Models, Online Course](https://www.udemy.com/course/deployment-of-machine-learning-models/?referralCode=D4FE5EA129FFD203CFF4)
-
-* [Python Feature Engineering Cookbook](https://packt.link/python)
-
-
-## Blogs about Feature-engine
-
-* [Feature-engine: A new open-source Python package for feature engineering](https://trainindata.medium.com/feature-engine-a-new-open-source-python-package-for-feature-engineering-29a0ab88ea7c)
-
-* [Practical Code Implementations of Feature Engineering for Machine Learning with Python](https://towardsdatascience.com/practical-code-implementations-of-feature-engineering-for-machine-learning-with-python-f13b953d4bcd)
-
-
-## En Español
-
-* [Ingeniería de variables para machine learning, Curso Online](https://www.udemy.com/course/ingenieria-de-variables-para-machine-learning/?referralCode=CE398C784F17BD87482C)
-
-* [Ingeniería de variables, MachinLenin, charla online](https://www.youtube.com/watch?v=NhCxOOoFXds)
+Mankey_stats is a Python library that allows the user to quickly and efficiently perform data preparation techniques to transform the datasets for ML modeling, this is done through the utilization of Scikit-learn's fit() and transform() methods.
 
 
 ## Documentation
 
-* [Documentation](http://feature-engine.readthedocs.io)
+* [Documentation](https://mankey-stats.readthedocs.io/en/main/#)
 
 
 ## Current Feature-engine's transformers include functionality for:
 
-* Missing Data Imputation
-* Categorical Encoding
-* Discretisation
-* Outlier Capping or Removal
-* Variable Transformation
-* Variable Creation
-* Variable Selection
 * Datetime Feature Extraction
+* Ordinal Encoding
+* Weight of Evidence Calculation for Categorical Variables
+* Outlier Detection 
+* Outlier Removal
+* Missing Value handling recommendation
+* Feature Normality test
+* Variable Selection
 * Preprocessing
 * Scikit-learn Wrappers
 
 ### Imputation Methods
-* MeanMedianImputer
-* RandomSampleImputer
-* EndTailImputer
-* AddMissingIndicator
-* CategoricalImputer
-* ArbitraryNumberImputer
-* DropMissingData
+* Fill Null Values with Mean/Median
 
 ### Encoding Methods
 * OneHotEncoder
 * OrdinalEncoder
-* CountFrequencyEncoder
-* MeanEncoder
 * WoEEncoder
-* PRatioEncoder
-* RareLabelEncoder
-* DecisionTreeEncoder
-
-### Discretisation methods
-* EqualFrequencyDiscretiser
-* EqualWidthDiscretiser
-* DecisionTreeDiscretiser
-* ArbitraryDiscreriser
 
 ### Outlier Handling methods
-* Winsorizer
-* ArbitraryOutlierCapper
-* OutlierTrimmer
+* Grubb's Test
 
 ### Variable Transformation methods
-* LogTransformer
-* LogCpTransformer
-* ReciprocalTransformer
-* PowerTransformer
-* BoxCoxTransformer
-* YeoJohnsonTransformer
+* MinMaxScaler
+* StandardScaler
 
 ### Variable Creation:
- * MathematicalCombination
- * CombineWithReferenceFeature
- * CyclicalTransformer
+ * date_expander
 
 ### Feature Selection:
- * DropFeatures
- * DropConstantFeatures
- * DropDuplicateFeatures
- * DropCorrelatedFeatures
- * SmartCorrelationSelection
- * ShuffleFeaturesSelector
- * SelectBySingleFeaturePerformance
- * SelectByTargetMeanPerformance
- * RecursiveFeatureElimination
- * RecursiveFeatureAddition
- * DropHighPSIFeatures
+ * 
 
 ### Datetime
  * DatetimeFeatures
@@ -152,26 +66,26 @@ transforming parameters from the data and then transform it.
 From PyPI using pip:
 
 ```
-pip install feature_engine
+pip install mankey_stats
 ```
 
 From Anaconda:
 
 ```
-conda install -c conda-forge feature_engine
+conda install -c conda-forge mankey_stats
 ```
 
 Or simply clone it:
 
 ```
-git clone https://github.com/feature-engine/feature_engine.git
+git clone https://github.com/mankey_stats/mankey_stats.git
 ```
 
 ## Example Usage
 
 ```python
 >>> import pandas as pd
->>> from feature_engine.encoding import RareLabelEncoder
+>>> from mankey_stats.plot_charts as Plot_mankey
 
 >>> data = {'var_A': ['A'] * 10 + ['B'] * 10 + ['C'] * 2 + ['D'] * 1}
 >>> data = pd.DataFrame(data)
