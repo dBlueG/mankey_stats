@@ -152,40 +152,45 @@ def missing_values_table(df):
     return mis_val_table_ren_columns
 
 
-# logic preparation
-def logic_preparation(x_df, no_treatment_columns=[]):
-    missing = missing_values_table(x_df).iloc[:, 1]
-    df_missing = pd.DataFrame(columns=['name', 'missing', 'treatment'])
+#logic preparation
+def logic_preparation(x_df, no_treatment_columns = [] ):
+    missing = missing_values_table(x_df).iloc[:,1]
+    df_missing = pd.DataFrame(columns=['name', 'missing','treatment' ])
 
     df_missing["missing"] = missing.tolist()
-    df_missing["name"] = missing.index.values.tolist()
-    df_missing.treatment = "Treat"
-    df_missing.treatment.loc[df_missing["missing"] >= 70] = "Drop Column"
+    df_missing["name"] = missing.index.values.tolist()    
+    df_missing.treatment = "Treat" 
+    df_missing.treatment.loc[df_missing["missing"] >= 70] = "Drop Column" 
     df_missing.treatment.loc[df_missing["missing"] < 5] = "Omit Observation"
-    df_missing.treatment.loc[df_missing["missing"] == 0] = "Do Nothing"
-
+    df_missing.treatment.loc[df_missing["missing"] == 0] = "Do Nothing" 
+  
+    columns_to_drop = []
+    columns_to_drop = df_missing.name.loc[df_missing["treatment"] == "Drop"].tolist() 
+    columns_to_drop = list(dict.fromkeys(columns_to_drop)) 
+    
+    
     for i in range(len(df_missing.index)):
         if (df_missing.iloc[i]["name"] in no_treatment_columns and
                 df_missing.iloc[i]["treatment"] == "Treat"):
             df_missing.treatment.iloc[i] = "Omit"
+            
+    if (len(columns_to_drop) > 0 ):
+        print("\nColumns to drop are :" )
+        print(*columns_to_drop, sep='\n')
 
-    columns_to_drop = df_missing.name.loc[df_missing["treatment"] == "Drop"].tolist(
-    )
-    columns_to_drop = list(dict.fromkeys(columns_to_drop))
-    print("\nColumns to drop are :")
-    print(*columns_to_drop, sep='\n')
-
-    columns_to_omit_missing_values = df_missing.name.loc[df_missing["treatment"] == "Omit"].tolist(
-    )
-    columns_to_omit_missing_values = list(
-        dict.fromkeys(columns_to_omit_missing_values))
-    print("\ncannot be treated columns is :")
-    print(*columns_to_omit_missing_values, sep='\n')
-
+    columns_to_omit_missing_values = [] 
+    columns_to_omit_missing_values = df_missing.name.loc[df_missing["treatment"] == "Omit"].tolist() 
+    columns_to_omit_missing_values = list(dict.fromkeys(columns_to_omit_missing_values)) 
+    
+    if (len(columns_to_omit_missing_values) > 0 ): 
+        print("\ncannot be treated columns is :" )
+        print(*columns_to_omit_missing_values, sep='\n')
+    
+    
     return df_missing
 
 
-def eval_df(df_o, normal_test_alpha=0.05,
+def eval_df_bk(df_o, normal_test_alpha=0.05,
             grubbs_alpha=0.05,
             grubbs_max_outliers=20,
             iqr_factor=2.5
@@ -313,6 +318,147 @@ def eval_df(df_o, normal_test_alpha=0.05,
                                            })
 
     return descriptive_statistics, logic_preparation(df), outliers
+
+
+
+def eval_df(df_o, 
+            normal_test_alpha = 0.05,
+            grubbs_alpha = 0.05,
+            grubbs_max_outliers = 20,
+            iqr_factor = 2.5 ):
+    df = df_o.copy()
+    
+    output = {} 
+    
+    output['name']          = []
+    output['count']         = []
+    output['missing']       = []
+    output['missing_prc']   = []
+    output['types']         = []
+    output['q1']            = []
+    output['q2']            = []
+    output['q3']            = []
+    output['is_normal']     = []
+    output['unique']        = []
+    output['top']           = []
+    output['freq']          = []
+    output['min']           = []
+    output['max']           = []
+    output['mean']          = [] 
+    output['variance']      = []
+    output['skewness']      = []
+    output['kurtosis']      = []
+    output['iqrs']          = []  
+    output['has_outliers']  = []  
+    outliers   = {}
+     
+
+    def get_stat(name): 
+        
+        mis_val         = df.isnull().sum()
+        mis_val_percent = 100 * df.isnull().sum() / len(df)  
+        
+        df_describe = df.describe(include='all')  
+        
+        output['name'].append(name)
+        output['count'].append(df_describe[name]['count'])
+        output['missing'].append( mis_val[name])
+        output['missing_prc'].append(mis_val_percent[name]) 
+         
+        if is_numeric_dtype(df[name]):
+            output['types'].append('Numerical')
+            
+            num_item_describe  =stats.describe(df[name]) 
+            output['q1'].append(df_describe[name]['25%'])
+            output['q3'].append(df_describe[name]['75%'])
+            
+            iqr = df_describe[name]['75%'] - df_describe[name]['25%']
+            
+            _, p = stats.normaltest(df[name])
+             
+            is_normal = True
+            if (p < normal_test_alpha):
+                is_normal = False 
+                output['is_normal'].append("Non-normal")  
+            else:
+                is_normal = True
+                output['is_normal'].append("Normal")
+                 
+            output['unique'].append(np.nan)
+            output['top'].append(np.nan)
+            output['freq'].append(np.nan) 
+            output['min'].append(df_describe[name]['min'])
+            output['max'].append(df_describe[name]['max'])
+            output['mean'].append(df_describe[name]['mean']) 
+            output['q2'].append(df_describe[name]['50%']) 
+            output['variance'].append(num_item_describe.variance)
+            output['skewness'].append(num_item_describe.skewness)
+            output['kurtosis'].append(num_item_describe.kurtosis)
+            output['iqrs'].append(iqr)   
+            
+            if (is_normal):  
+                _ , grubbs_outliers = grubbs( df[name].dropna() , grubbs_max_outliers, grubbs_alpha,name) 
+                
+                if len(grubbs_outliers) > 0:
+                    outliers[name]  = grubbs_outliers
+            else:  
+                iqr_outliers =  detect_outliers(df[name],iqr_factor) 
+                
+                if len(iqr_outliers) > 0:
+                    outliers[name]  = iqr_outliers  
+             
+            if name in outliers:
+                output['has_outliers'].append('True')
+            else:
+                output['has_outliers'].append('False')
+                    
+        else: 
+            output['types'].append('Categorical')
+            output['unique'].append(df_describe[name]['unique'])
+            output['top'].append(df_describe[name]['top'])
+            output['freq'].append(df_describe[name]['freq']) 
+            output['min'].append(np.nan)
+            output['max'].append(np.nan)
+            output['mean'].append(np.nan)
+            output['variance'].append(np.nan)
+            output['skewness'].append(np.nan)
+            output['kurtosis'].append(np.nan)
+            output['q1'].append(np.nan)
+            output['q2'].append(np.nan)
+            output['q3'].append(np.nan) 
+            output['iqrs'].append(np.nan) 
+            output['is_normal'].append(np.nan) 
+            output['has_outliers'].append(np.nan) 
+    
+    
+    vfunc = np.vectorize(get_stat) 
+    vfunc(df.columns)
+ 
+    descriptive_statistics = pd.DataFrame({'Name'     : output['name'],
+                                           'Type'     : output['types'] ,
+                                           'Count'    : output['count'], 
+                                           'Unique'   : output['unique'],
+                                           'Top'      : output['top'],
+                                           'Freq'     : output['freq'] ,
+                                           'Min'      : output['min'],
+                                           'Max'      : output['mean'],
+                                           'Mean'     : output['mean'],
+                                           'Variance' : output['variance'] ,
+                                           'Skewness' : output['skewness'],
+                                           'Kurtosis' : output['kurtosis'], 
+                                           '25%'      : output['q1'],
+                                           '50%'      : output['q2'],
+                                           '75%'      : output['q3'] ,
+                                           'IQR'      : output['iqrs'] ,
+                                           '# Missing Values' : output['missing'],
+                                           '% Missing Values' : output['missing_prc'],
+                                           'Is Normal': output['is_normal'],
+                                           'Has Outliers':output['has_outliers']
+                                           })
+    
+    
+    
+    return descriptive_statistics , logic_preparation(df) , outliers
 
 
 def clean_data(df_train, df_test):
