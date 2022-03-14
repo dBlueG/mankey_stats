@@ -78,13 +78,9 @@ class Ordinal_Transformer(BaseEstimator, TransformerMixin):
         super().__init__()
         self.dict_ = {}
 
-    def fit(self, class_order_dict, X: pd.DataFrame, y=None, input_vars=[]):
+    def fit(self, class_order_dict, X: pd.DataFrame, y=None):
 
         self.df = X
-
-        # make sure we have the same columns as input_vars
-        # if list(X.columns)!=input_vars:
-        #    return("Columns do not match")
 
         self.features_transform = []
         self.feature_levels = []
@@ -137,7 +133,7 @@ class WoE_Transformer(BaseEstimator, TransformerMixin):
 
         return woe_df
 
-    def fit(self, X: pd.DataFrame, y: pd.Series, target_name: str, input_vars=[],   num_cat_threshold=5):
+    def fit(self, X: pd.DataFrame, y: pd.Series, input_vars=[],   num_cat_threshold=5):
         self.df = X
         self.input_vars = input_vars
         self.df['target'] = y
@@ -151,7 +147,7 @@ class WoE_Transformer(BaseEstimator, TransformerMixin):
         # ln(#bad / #good) per class
         for var_name in input_vars:
             if(X[var_name].nunique() >= num_cat_threshold):
-                woe_df = self._woe_cal(var_name, target_name)
+                woe_df = self._woe_cal(var_name, 'target')
                 self.dict_[var_name] = woe_df
             else:
                 self.input_vars.remove(var_name)
