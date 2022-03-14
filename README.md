@@ -18,7 +18,7 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 * [Documentation](https://mankey-stats.readthedocs.io/en/main/#)
 
 
-## Current Feature-engine's transformers include functionality for:
+## Current mankey-stats's transformers include functionality for:
 
 * Datetime Feature Extraction
 * Ordinal Encoding
