@@ -85,62 +85,46 @@ git clone https://github.com/mankey_stats/mankey_stats.git
 
 ```python
 >>> import pandas as pd
->>> from mankey_stats.plot_charts as Plot_mankey
+>>> from mankey_stats.ordinal_encoder as ordinal_encoder
 
->>> data = {'var_A': ['A'] * 10 + ['B'] * 10 + ['C'] * 2 + ['D'] * 1}
+>>> data = {'type':  ['bad', 'average', 'good', 'very good', 'excellent'],
+            'level': [1, 2, 3, 4, 5]
 >>> data = pd.DataFrame(data)
->>> data['var_A'].value_counts()
+>>> print(data)
 ```
 
 ```
 Out[1]:
-A    10
-B    10
-C     2
-D     1
+type    level
+bad       1
+average   2
+good      3
+very good 4
+excellent 5  
 Name: var_A, dtype: int64
 ```
     
 ```python 
->>> rare_encoder = RareLabelEncoder(tol=0.10, n_categories=3)
->>> data_encoded = rare_encoder.fit_transform(data)
->>> data_encoded['var_A'].value_counts()
+>>> ordinal_encoding = Oridnal_encoder()
+>>> data_encoded = ordinal_encoding(data)
+>>> print(data_encoded)
 ```
 
 ```
 Out[2]:
-A       10
-B       10
-Rare     3
+0       1
+1       2
+2       3
+3       4
+4       5
 Name: var_A, dtype: int64
 ```
 
-Find more examples in our [Jupyter Notebook Gallery](https://nbviewer.org/github/feature-engine/feature-engine-examples/tree/main/) 
-or in the [documentation](http://feature-engine.readthedocs.io).
-
-## Contribute
-
-Details about how to contribute can be found in the [Contribute Page](https://feature-engine.readthedocs.io/en/latest/contribute/index.html)
-
-Briefly:
-
-- Fork the repo
-- Clone your fork into your local computer: ``git clone https://github.com/<YOURUSERNAME>/feature_engine.git``
-- navigate into the repo folder ``cd feature_engine``
-- Install Feature-engine as a developer: ``pip install -e .``
-- Optional: Create and activate a virtual environment with any tool of choice
-- Install Feature-engine dependencies: ``pip install -r requirements.txt`` and ``pip install -r test_requirements.txt``
-- Create a feature branch with a meaningful name for your feature: ``git checkout -b myfeaturebranch``
-- Develop your feature, tests and documentation
-- Make sure the tests pass
-- Make a PR
-
-Thank you!!
-
+Find more in the [documentation](https://mankey-stats.readthedocs.io/en/main/#).
 
 ### Documentation
 
-Feature-engine documentation is built using [Sphinx](https://www.sphinx-doc.org) and is hosted on [Read the Docs](https://readthedocs.org/).
+mankey-stats documentation is built using [Sphinx](https://www.sphinx-doc.org) and is hosted on [Read the Docs](https://readthedocs.org/).
 
 To build the documentation make sure you have the dependencies installed: from the root directory: ``pip install -r docs/requirements.txt``.
 
@@ -151,7 +135,3 @@ Now you can build the docs using: ``sphinx-build -b html docs build``
 
 BSD 3-Clause
 
-## Donate
-
-[Sponsor us](https://github.com/sponsors/solegalli) to support her continue expanding 
-Feature-engine.
