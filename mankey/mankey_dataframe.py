@@ -364,16 +364,20 @@ class MankeyDataFrame(pd.DataFrame):
             X_train  = pipeline.transform(X_train)
             X_test = pipeline.transform(X_test)
         """
-            ohe_transformer = preprocessing.OneHotEncoder()
+            ohe_transformer = preprocessing.OneHotEncoder(sparse=False)
             ohe_transformer.fit(X_train[ohe_vars])
             
-            X_train_ohe = pd.DataFrame(ohe_transformer.transform(X_train[ohe_vars]), columns = ohe_transformer.get_feature_names([ohe_vars]))
-            X_test_ohe = pd.DataFrame(ohe_transformer.transform(X_test[ohe_vars]), columns = ohe_transformer.get_feature_names([ohe_vars]))
+            X_train_ohe = X_train_ohe = pd.DataFrame(ohe_transformer.transform(X_train[ohe_vars]), columns=ohe_transformer.get_feature_names())
+            X_test_ohe = pd.DataFrame(ohe_transformer.transform(X_test[ohe_vars]), columns=ohe_transformer.get_feature_names())
 
-            X_train_ohe.set_index(X_train_in.index, inplace=True)
-            X_test_ohe.set_index(X_test_in.index , inplace=True)
-            X_train = pd.concat([X_train, X_train_ohe], axis=1).drop([ohe_vars], axis=1)
-            X_test = pd.concat([X_test, X_test_ohe], axis=1).drop([ohe_vars], axis=1)
+            X_train_ohe.set_index(X_train.index, inplace=True)
+            X_test_ohe.set_index(X_test.index , inplace=True)
+            X_train = pd.concat([X_train, X_train_ohe], axis=1)
+            X_test = pd.concat([X_test, X_test_ohe], axis=1)
+
+            print("remove remaining Categorical variables after OHE")
+            X_train.drop(columns = ohe_vars, axis = 1, inplace = True)
+            X_test.drop(columns = ohe_vars, axis = 1, inplace = True)
         """
         
         ohe_vars = []e
