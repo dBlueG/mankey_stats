@@ -160,8 +160,8 @@ def logic_preparation(x_df, no_treatment_columns = [] ):
     df_missing["missing"] = missing.tolist()
     df_missing["name"] = missing.index.values.tolist()    
     df_missing.treatment = "Treat" 
-    df_missing.treatment.loc[df_missing["missing"] >= 70] = "Drop Column" 
-    df_missing.treatment.loc[df_missing["missing"] < 5] = "Omit Observation"
+    df_missing.treatment.loc[df_missing["missing"] >= 70] = "Drop" 
+    df_missing.treatment.loc[df_missing["missing"] < 5] = "Omit"
     df_missing.treatment.loc[df_missing["missing"] == 0] = "Do Nothing" 
   
     columns_to_drop = []
@@ -344,7 +344,8 @@ def eval_df(df_o,
     output['freq']          = []
     output['min']           = []
     output['max']           = []
-    output['mean']          = [] 
+    output['mean']          = []
+    output['sd']            = [] 
     output['variance']      = []
     output['skewness']      = []
     output['kurtosis']      = []
@@ -354,11 +355,13 @@ def eval_df(df_o,
      
 
     def get_stat(name): 
+        if(name in output['name']):
+            return
         
         mis_val         = df.isnull().sum()
         mis_val_percent = 100 * df.isnull().sum() / len(df)  
         
-        df_describe = df.describe(include='all')  
+        df_describe = df.describe(include='all', datetime_is_numeric=True)  
         
         output['name'].append(name)
         output['count'].append(df_describe[name]['count'])
@@ -390,13 +393,17 @@ def eval_df(df_o,
             output['min'].append(df_describe[name]['min'])
             output['max'].append(df_describe[name]['max'])
             output['mean'].append(df_describe[name]['mean']) 
+            output['sd'].append(df_describe[name]['std']) 
             output['q2'].append(df_describe[name]['50%']) 
             output['variance'].append(num_item_describe.variance)
             output['skewness'].append(num_item_describe.skewness)
             output['kurtosis'].append(num_item_describe.kurtosis)
-            output['iqrs'].append(iqr)   
-            
-            if (is_normal):  
+            output['iqrs'].append(iqr)
+            #to skip outlier detection in binary vars or very small range features   
+            if(df_describe[name]['max'] -  df_describe[name]['min'] <= 1):
+                pass
+
+            elif (is_normal):  
                 _ , grubbs_outliers = grubbs( df[name].dropna() , grubbs_max_outliers, grubbs_alpha,name) 
                 
                 if len(grubbs_outliers) > 0:
@@ -420,6 +427,7 @@ def eval_df(df_o,
             output['min'].append(np.nan)
             output['max'].append(np.nan)
             output['mean'].append(np.nan)
+            output['sd'].append(np.nan)
             output['variance'].append(np.nan)
             output['skewness'].append(np.nan)
             output['kurtosis'].append(np.nan)
@@ -441,8 +449,9 @@ def eval_df(df_o,
                                            'Top'      : output['top'],
                                            'Freq'     : output['freq'] ,
                                            'Min'      : output['min'],
-                                           'Max'      : output['mean'],
+                                           'Max'      : output['max'],
                                            'Mean'     : output['mean'],
+                                           'SD'       : output['sd'],
                                            'Variance' : output['variance'] ,
                                            'Skewness' : output['skewness'],
                                            'Kurtosis' : output['kurtosis'], 
@@ -486,9 +495,9 @@ def clean_data(df_train, df_test):
             df_test_clean = df_test_clean.loc[~df_test_clean[item].isin(
                 outliers_test[item])]
 
-    print("Number of rows before handling the missing values in training " +
+    print("Number of rows after handling outliers (before handling missing data) in training " +
           str(df_clean.shape[0])+"\n")
-    print("Number of rows before handling the missing values in testing " +
+    print("Number of rows after handling outliers (before handling missing data) in testing " +
           str(df_test_clean.shape[0])+"\n")
 
     for column in df_clean.columns:
@@ -499,17 +508,13 @@ def clean_data(df_train, df_test):
             df_clean = df_clean.dropna(subset=[column])
         elif(df_treatment_logic_test.loc[df_treatment_logic_test.name == column, :].treatment.tolist()[0] == "Omit"):
             df_test_clean = df_test_clean.dropna(subset=[column])
-        else:
-            pass
+        
 
-    print("Number of rows after handling the missing values and before outliers treatment in training " +
-          str(df_clean.shape[0])+"\n")
-    print("Number of rows after handling the missing values and before outliers treatment in testing " +
-          str(df_test_clean.shape[0])+"\n")
+   
 
     # Outliers Tratment
 
-    # imput based if the data is normal or not
+    # impute based if the data is normal or not
     for item in df_clean.columns:
         row = descriptive_statistics[descriptive_statistics['Name'] == item]
         is_norm = str(row['Is Normal'].to_string(index=False))
@@ -522,12 +527,12 @@ def clean_data(df_train, df_test):
             df_clean[item].fillna((df_clean[item].median()), inplace=True)
             df_test_clean[item].fillna((df_clean[item].median()), inplace=True)
         else:
-            df_clean[item].fillna((df_clean[item].mode()), inplace=True)
-            df_test_clean[item].fillna((df_clean[item].mode()), inplace=True)
+            df_clean[item].fillna((df_clean[item].mode()[0]), inplace=True)
+            df_test_clean[item].fillna((df_clean[item].mode()[0]), inplace=True)
 
     print("Number of rows after handling the missing values in training " +
           str(df_clean.shape[0])+"\n")
     print("Number of rows after handling the missing values in testing " +
-          str(df_clean.shape[0])+"\n")
+          str(df_test_clean.shape[0])+"\n")
 
     return df_clean, df_test_clean

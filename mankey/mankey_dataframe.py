@@ -21,6 +21,15 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn import preprocessing
+from sklearn.base import BaseEstimator
+from sklearn.base import TransformerMixin
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import make_column_transformer
+from sklearn.compose import make_column_selector
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
 
 from pandas.api.types import is_numeric_dtype, is_object_dtype
 import numpy as np
@@ -191,13 +200,16 @@ class MankeyDataFrame(pd.DataFrame):
             print(descriptive_statistics)
 
         else:
-            return stats_helpers.clean_data(df_train, df_test)
+            (df_clean, df_clean_test) = stats_helpers.clean_data(df_train, df_test)
+            #X_train, y_train, X_test, y_test
+            return df_clean.loc[:, df_clean.columns != target_var], df_clean[target_var], \
+                   df_clean_test.loc[:, df_clean_test.columns != target_var], df_clean_test[target_var]
 
         
     
  
-    def recommended_transformation(self, X_train, y_train, X_test, y_test,   ordinal_var = {}, woe_cat_threshold=5, print_only = True, expand_dates = 'all'
-    , due_date = "EXPECTED_CLOSE_DATE", start_date = "LOAN_OPEN_DATE"):
+    def recommended_transformation(self, X_train, y_train, X_test, y_test, input_vars = [], ordinal_var = {}, woe_cat_threshold=5, print_only = True, expand_dates = 'all'
+    , due_date = "EXPECTED_CLOSE_DATE", start_date = "LOAN_OPEN_DATE", target_var = 'BINARIZED_TARGET'):
         """
         This method can be used to recommend and/or apply transformations including:
         impute missing values, date manipulations, categorical variable handling (dummy/WoE/ordinal).
@@ -212,7 +224,7 @@ class MankeyDataFrame(pd.DataFrame):
         
         Parameters
         ----------
-        #input_vars: list of columns (to limit the evaluation to certain features only)
+        input_vars: list of columns (to limit the evaluation to certain features only)
         X_train: subset to be used for training
         X_test: subset to be used for test
         y_train: target output related to X_train
@@ -229,9 +241,16 @@ class MankeyDataFrame(pd.DataFrame):
           A print with the analysis or new transformed columns.                
         """
         result = {}
+        if(input_vars):
+            X_train = X_train[input_vars]
+            X_test = X_test[input_vars]
         #remaining_vars = X_train.columns 
 
-        if(X_train.columns != X_test.columns or X_train.dtypes != X_test.dtypes):
+        if(X_train.isna().sum().values.sum() > 0 or X_test.isna().sum().values.sum() > 0):
+            print("X_train and X_test still have missing values, consider the clean missing method ")
+            return
+
+        if(not ((X_train.columns != X_test.columns).sum() == 0 and (X_train.dtypes != X_test.dtypes).sum() == 0)):
             print("X_train and X_test do not have matching feature list (columns)")
             return
 
@@ -240,24 +259,27 @@ class MankeyDataFrame(pd.DataFrame):
         std_scaler = []
         minmax_scaler = []
         for col in X_train.select_dtypes(include=np.number):
-            if(descriptive_statistics[descriptive_statistics["Name"] == col]["Is Normal"] == "Normal"):
-                print(f"Feature {col} will be scaled with a normalized scaler (since it is normally distributed")
+            if((descriptive_statistics[descriptive_statistics["Name"] == col]["Is Normal"] == "Normal").bool()):
+                print(f"Feature {col} will be scaled with a normalized scaler (since it is normally distributed)")
                 std_scaler.append(col)
             else:
-                print(f"Feature {col} will be scaled with a Min Max scaler (since it is NOT normally distributed")
+                print(f"Feature {col} will be scaled with a Min Max scaler (since it is NOT normally distributed)")
                 minmax_scaler.append(col)
-
-        #scale numeric features (normal)
-        std_scaler_transformer = StandardScaler()
-        std_scaler_transformer.fit(X_train[std_scaler])
-        X_train[std_scaler] = std_scaler_transformer.transform(X_train[std_scaler])
-        X_test[std_scaler] = std_scaler_transformer.transform(X_test[std_scaler])
-
-        #scale numeric features (non-normal)
-        minmax_scaler_transformer = MinMaxScaler()
-        minmax_scaler_transformer.fit(X_train[minmax_scaler])
-        X_train[minmax_scaler] = minmax_scaler_transformer.transform(X_train[minmax_scaler])
-        X_test[minmax_scaler] = minmax_scaler_transformer.transform(X_test[minmax_scaler])
+        print('debug - TODO')
+        print(std_scaler)
+        print('TODO')
+        if(std_scaler):
+            #scale numeric features (normal)
+            std_scaler_transformer = StandardScaler()
+            std_scaler_transformer.fit(X_train[std_scaler])
+            X_train[std_scaler] = std_scaler_transformer.transform(X_train[std_scaler])
+            X_test[std_scaler] = std_scaler_transformer.transform(X_test[std_scaler])
+        if(minmax_scaler):
+            #scale numeric features (non-normal)
+            minmax_scaler_transformer = MinMaxScaler()
+            minmax_scaler_transformer.fit(X_train[minmax_scaler])
+            X_train[minmax_scaler] = minmax_scaler_transformer.transform(X_train[minmax_scaler])
+            X_test[minmax_scaler] = minmax_scaler_transformer.transform(X_test[minmax_scaler])
 
         
 
@@ -266,10 +288,13 @@ class MankeyDataFrame(pd.DataFrame):
         if(due_date in X_train.columns and start_date in X_train.columns):
             X_train['due_in_days'] = X_train[due_date] - X_train[start_date]
             X_test['due_in_days'] = X_test[due_date] - X_test[start_date]
+            X_train['due_in_days'] = X_train['due_in_days'].dt.days
+            X_test['due_in_days'] = X_test['due_in_days'].dt.days
         else:
             print("No due date calculation since columns specified are not in the dataset")
         
-
+        print(y_train.shape)
+        print(X_train.shape)
         # dates expansion
         for col in X_train.select_dtypes(include=['datetime64[ns]']):
             print(f"Exapnding feature {col} to {expand_dates}")
@@ -284,11 +309,12 @@ class MankeyDataFrame(pd.DataFrame):
                 X_test[col+"_day"] = X_test[col].dt.day
             
             print(f"Dropping the feature {col} after expansion")
-            X_train.drop(col, inplace = True)
-            X_test.drop(col, inplace = True)
+            X_train.drop(col, axis = 1, inplace = True)
+            X_test.drop(col, axis = 1, inplace = True)
 
         # categorical
-                
+        print(y_train.shape)
+        print(X_train.shape)        
         #ordinal
         print("Ordinal variables specificed will be transformed to numeric according to the specified order")
         if(ordinal_var):
@@ -298,7 +324,7 @@ class MankeyDataFrame(pd.DataFrame):
             X_train = ordinal_transformer.transform(X_train, None)
             X_test = ordinal_transformer.transform(X_test, None)
             
-
+        
         #WoE transformations
         woe_vars = []
         for feature in X_train.select_dtypes(exclude=[np.number]):
@@ -308,40 +334,78 @@ class MankeyDataFrame(pd.DataFrame):
                 print(f"Feature {feature} will be transformed to numeric using WoE - Weight of Evidence as it has more classes than the threshold")
                 result[feature] = 'Weight of Evidence (WoE) transformation'
                 woe_vars.append(feature)
-                
+        
+        
         if(not print_only):
-            (X_train[woe_vars], X_test[woe_vars]) = self.woe_categorical(self, X_train[woe_vars], y_train, X_test[woe_vars], y_test, input_vars=woe_vars, target_var = target)
-
+            for feature in woe_vars:
+                X_train[feature] = X_train[feature].cat.remove_unused_categories()
+                X_test[feature] = X_test[feature].cat.remove_unused_categories()
+            #(X_train[woe_vars], X_test[woe_vars]) = self.woe_categorical(self, X_train[woe_vars], y_train, X_test[woe_vars], y_test, woe_vars, target_var)
+            
+            t_woe = custom.WoE_Transformer()
+            
+            t_woe.fit(X_train, y_train, target_var, woe_vars,  woe_cat_threshold)
+            X_train = t_woe.transform(X_train,y_train)
+            X_test = t_woe.transform(X_test, y_test)
+            
         #remaining - one hot encoding
-        ohe_vars = []
+        
+        ohe_vars = [col for col in X_train.columns if not is_numeric_dtype(X_train[col])]
+        print("ohe - begin")
+        print(ohe_vars)
+    # define the data preparation for the columns
+        if(ohe_vars):
+            """
+            t = [('cat', OneHotEncoder(), ohe_vars)]
+            col_transform = ColumnTransformer(transformers=t)
+            pipeline = Pipeline(steps=[ ('prep',col_transform) ])
+
+            pipeline.fit(X_train, y_train)
+            X_train  = pipeline.transform(X_train)
+            X_test = pipeline.transform(X_test)
+        """
+            ohe_transformer = preprocessing.OneHotEncoder()
+            ohe_transformer.fit(X_train[ohe_vars])
+            
+            X_train_ohe = pd.DataFrame(ohe_transformer.transform(X_train[ohe_vars]), columns = ohe_transformer.get_feature_names([ohe_vars]))
+            X_test_ohe = pd.DataFrame(ohe_transformer.transform(X_test[ohe_vars]), columns = ohe_transformer.get_feature_names([ohe_vars]))
+
+            X_train_ohe.set_index(X_train_in.index, inplace=True)
+            X_test_ohe.set_index(X_test_in.index , inplace=True)
+            X_train = pd.concat([X_train, X_train_ohe], axis=1).drop([ohe_vars], axis=1)
+            X_test = pd.concat([X_test, X_test_ohe], axis=1).drop([ohe_vars], axis=1)
+        """
+        
+        ohe_vars = []e
         for feature in X_train.select_dtypes(exclude=[np.number]):
             ohe_vars.append(ohe_vars)
         
-        (X_train_ohe, X_test_ohe) = self.fun_ohe(X_train, X_test, ohe_vars)
-        
-        X_train = pd.concat([X_train, X_train_ohe], axis=1).drop([ohe_vars], axis=1)
-        X_test = pd.concat([X_test, X_test_ohe], axis=1).drop([ohe_vars], axis=1)
-        
+        for feature in ohe_vars:
+            (X_train_ohe, X_test_ohe) = self.fun_ohe(X_train, X_test, feature)
+            
+            X_train = pd.concat([X_train, X_train_ohe], axis=1).drop([feature], axis=1)
+            X_test = pd.concat([X_test, X_test_ohe], axis=1).drop([feature], axis=1)
+
+        """
         return X_train, X_test
     
-    def woe_categorical(self, X_train, y_train, X_test, y_test, input_vars=[], target_var = 'target', num_cat_threshold = 5):
+    def woe_categorical(self, X_train, y_train, X_test, y_test, input_vars, target_var, num_cat_threshold = 5):
         """
         TODO: This method gets a list of categorical columns and target variable, this calculates
         the WoE for each column and each class within it (fit), this can be used later to transform
         the test set
 
         """
-        t_woe = custom.WoE_Transformer()
-        t_woe.fit(X_train, y_train, target_var, input_vars)
-        t_woe.transform(X_train,y_train)
-        t_woe.tranform(X_test, y_test)
+        
         
 
-        return (X_train, X_test)
+        #return (X_train, X_test)
         
 
 
     def fun_ohe(self, X_train_in, X_test_in, variable):
+        print(X_train_in.shape)
+        print(X_test_in.shape)
         ohe = OneHotEncoder(sparse=False)
         ohe.fit(X_train_in[[variable]])
         ohe_train = pd.DataFrame(ohe.transform(X_train_in[[variable]]), columns = ohe.get_feature_names([variable]))
