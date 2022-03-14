@@ -152,36 +152,41 @@ def missing_values_table(df):
     return mis_val_table_ren_columns
 
 
-# logic preparation
-def logic_preparation(x_df, no_treatment_columns=[]):
-    missing = missing_values_table(x_df).iloc[:, 1]
-    df_missing = pd.DataFrame(columns=['name', 'missing', 'treatment'])
+#logic preparation
+def logic_preparation(x_df, no_treatment_columns = [] ):
+    missing = missing_values_table(x_df).iloc[:,1]
+    df_missing = pd.DataFrame(columns=['name', 'missing','treatment' ])
 
     df_missing["missing"] = missing.tolist()
-    df_missing["name"] = missing.index.values.tolist()
-    df_missing.treatment = "Treat"
-    df_missing.treatment.loc[df_missing["missing"] >= 70] = "Drop Column"
+    df_missing["name"] = missing.index.values.tolist()    
+    df_missing.treatment = "Treat" 
+    df_missing.treatment.loc[df_missing["missing"] >= 70] = "Drop Column" 
     df_missing.treatment.loc[df_missing["missing"] < 5] = "Omit Observation"
-    df_missing.treatment.loc[df_missing["missing"] == 0] = "Do Nothing"
-
+    df_missing.treatment.loc[df_missing["missing"] == 0] = "Do Nothing" 
+  
+    columns_to_drop = []
+    columns_to_drop = df_missing.name.loc[df_missing["treatment"] == "Drop"].tolist() 
+    columns_to_drop = list(dict.fromkeys(columns_to_drop)) 
+    
+    
     for i in range(len(df_missing.index)):
         if (df_missing.iloc[i]["name"] in no_treatment_columns and
                 df_missing.iloc[i]["treatment"] == "Treat"):
             df_missing.treatment.iloc[i] = "Omit"
+            
+    if (len(columns_to_drop) > 0 ):
+        print("\nColumns to drop are :" )
+        print(*columns_to_drop, sep='\n')
 
-    columns_to_drop = df_missing.name.loc[df_missing["treatment"] == "Drop"].tolist(
-    )
-    columns_to_drop = list(dict.fromkeys(columns_to_drop))
-    print("\nColumns to drop are :")
-    print(*columns_to_drop, sep='\n')
-
-    columns_to_omit_missing_values = df_missing.name.loc[df_missing["treatment"] == "Omit"].tolist(
-    )
-    columns_to_omit_missing_values = list(
-        dict.fromkeys(columns_to_omit_missing_values))
-    print("\ncannot be treated columns is :")
-    print(*columns_to_omit_missing_values, sep='\n')
-
+    columns_to_omit_missing_values = [] 
+    columns_to_omit_missing_values = df_missing.name.loc[df_missing["treatment"] == "Omit"].tolist() 
+    columns_to_omit_missing_values = list(dict.fromkeys(columns_to_omit_missing_values)) 
+    
+    if (len(columns_to_omit_missing_values) > 0 ): 
+        print("\ncannot be treated columns is :" )
+        print(*columns_to_omit_missing_values, sep='\n')
+    
+    
     return df_missing
 
 
