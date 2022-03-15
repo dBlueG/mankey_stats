@@ -27,7 +27,6 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 * Outlier Removal
 * Missing Value handling recommendation
 * Feature Normality test
-* Variable Selection
 * Preprocessing
 * Scikit-learn Wrappers
 
