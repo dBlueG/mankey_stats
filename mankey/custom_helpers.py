@@ -4,72 +4,8 @@ import pandas as pd
 import numpy as np
 import datetime
 
-# Date transformer
-
-
-def date_expander(X, input_var=[], ref_date_column = None, replace = True):
-    """
-    Expands a date series/or dataframe with date columns into a new data frame with 
-    five columns for each date: day of the week, month of the year, day of month, days till due date (need reference date),
-    and the year.
-    date_format: how the date is formated in the data (YYYY-MM-DD)
-
-    Parameters
-    ----------
-        X: dataframe or series
-        input_var: list of feature names containing dates
-        replace: update the original dataframe (remove date column and replace with expanded) or create new df with only expanded dates
-       
-    Returns
-    -------
-        A new dataframe with expanded date information (see description)
-
-    """
-    vect_ufunc = np.vectorize(_date_expand_func)
-    new_df = pd.DataFrame()
-    for date_feature in input_var:
-        if(ref_date_column):
-            expanded_date = vect_ufunc(X[date_feature], X[ref_date_column])
-        else: 
-            expanded_date = vect_ufunc(X[date_feature], '')
-        df = pd.DataFrame(expanded_date).transpose()
-        if(not ref_date_column):
-            df = df.iloc[:,:-1]
-            df.columns = (date_feature+ "_year", date_feature+"_month", date_feature+"_day", date_feature+"_dofweek")
-        else:
-            df.columns = (date_feature+ "_year", date_feature+"_month", date_feature+"_day", date_feature+"_dofweek", date_feature+"_days_remaining_till_"+ref_date_column)
-        
-        if(replace):
-            X.drop(date_feature, inplace = True, axis = 0)
-            new_df = pd.concat([df, X])
-        else:
-            new_df = pd.concat([new_df, df])
-
-    return new_df
-
-def _date_expand_func(main_date, ref_date):
-    if(not main_date):
-        return (np.nan, np.nan, np.nan, np.nan, np.nan)
-    dt = datetime.date(int(main_date[:4]), int(main_date[5:7]), int(main_date[8:10]))
-    if(ref_date):
-        ref_dt = datetime.date(int(ref_date[:4]), int(ref_date[5:7]), int(ref_date[8:10]))
-
-    day_of_month = dt.strftime("%d")
-    month_of_year = dt.strftime("%m")
-    year = dt.strftime("%Y")
-    day_of_week = dt.strftime("%w")
-    
-    if(ref_date):
-        delta = dt - ref_dt
-        days_remaining = abs(delta.days)
-    else:
-        days_remaining = np.nan
-    
-    return(year, month_of_year, day_of_month, day_of_week, days_remaining)
 
 # Ordinal transformer
-
-
 class Ordinal_Transformer(BaseEstimator, TransformerMixin):
 
     ord_enc = []
