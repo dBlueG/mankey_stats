@@ -10,67 +10,57 @@
 ![alt text](https://github.com/dBlueG/mankey_stats/blob/main/mankey.png)
 
 
-Mankey_stats is a Python library that allows the user to quickly and efficiently perform data preparation techniques to transform the datasets for ML modeling, this is done through the utilization of Scikit-learn's fit() and transform() methods.
+Mankey_stats is a Python library that allows the user to quickly and efficiently perform data preparation techniques to transform the datasets for ML modeling, this is done through the utilization of several transformation and statistical analysis methods.
 
 
 ## Documentation
 
 * [Documentation](https://mankey-stats.readthedocs.io/en/main/#)
 
+## Primary functionality include:
 
-## Current mankey-stats's transformers include functionality for:
+* Detailed analysis of features, including numerical distibution tests
+* Analysis and handling of outliers and missing data
+* Interactive plotting and data visualization functionality
+* Tranformation options including One hot encoding, ordinal transformations, and weight of evidence
+* Functionality to prepare date fields for ML models
+* Ability to examine and recommend without modifying the underlying data
+* Optimized logic to ensure fast execution times, using numpy, scipy, and vectorization techniques
 
-* Datetime Feature Extraction
-* Ordinal Encoding
-* Weight of Evidence Calculation for Categorical Variables
-* Outlier Detection 
-* Outlier Removal
-* Missing Value handling recommendation
+## Analysis of features:
+
 * Feature Normality test
-* Variable Selection
-* Preprocessing
-* Scikit-learn Wrappers
+* Grubb's test and Tucky's fences for handling outliers (based on stat. distribution)
+* Missing value analysis (% and best method to handle - mode/median/or mean)
+* Best scaling methods are selected for each numeric feature (min-max scaler or standard scaler)
 
-### Imputation Methods
-* Fill Null Values with Mean/Median
+## Multiple methods to handle categorical features:
 
-### Encoding Methods
-* OneHotEncoder
-* OrdinalEncoder
-* WoEEncoder
+* One Hot encoder
+* Ordinal encoder
+* Weight of Evidence transformations
 
-### Outlier Handling methods
-* Grubb's Test
+## Date manipulation
 
-### Variable Transformation methods
-* MinMaxScaler
-* StandardScaler
+* Ability to expand date fields to YEAR, MONTH, and/or DAY fields
+* Subtract date features to create a "due in days" field
 
-### Variable Creation:
- * date_expander
 
-### Datetime
- * date_expander
- 
-### Preprocessing
- * MatchVariables
- 
-### Wrappers:
- * Based on Sklearn Transformers
 
-## Installation
+# Installation
 
-From PyPI using pip:
-
+The library is published in the PyPi repository, it can be installed with pip:
 ```
 pip install mankey_stats
 ```
 
-Or simply clone it from github:
-
+Feel free to help us improve, simply clone it from this github and submit your features :)
 ```
 git clone https://github.com/mankey_stats/mankey_stats.git
 ```
+
+# Dependencies:
+We rely on the proven ML libraries: pandas, Seabor, plotly, numpy, scipy, and Scikit Learn
 
 ## Example Usage
 
@@ -117,9 +107,7 @@ Find more in the [documentation](https://mankey-stats.readthedocs.io/en/main/#).
 
 mankey-stats documentation is built using [Sphinx](https://www.sphinx-doc.org) and is hosted on [Read the Docs](https://readthedocs.org/).
 
-To build the documentation make sure you have the dependencies installed: from the root directory: ``pip install -r docs/requirements.txt``.
-
-Now you can build the docs using: ``sphinx-build -b html docs build``
+You can re-build the docs using `build html`
 
 
 ## License
