@@ -5,6 +5,11 @@ import plotly.graph_objs as gobj
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_datetime64_dtype
 def plot_categorical(df,col_name,unit = 'Y'):
+    """
+    This function is used to plot the categorical data in a bar chart for univariate analysis.
+    
+    """
+
     data = df
     values_count = pd.DataFrame(data[col_name].value_counts())
     if is_datetime64_dtype(df[col_name]):
