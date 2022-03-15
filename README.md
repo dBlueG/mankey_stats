@@ -66,14 +66,7 @@ From PyPI using pip:
 pip install mankey_stats
 ```
 
-From Anaconda:
-
-```
-conda install -c conda-forge mankey_stats
-
-```
-
-Or simply clone it:
+Or simply clone it from github:
 
 ```
 git clone https://github.com/mankey_stats/mankey_stats.git
