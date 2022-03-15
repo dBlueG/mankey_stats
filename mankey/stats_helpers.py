@@ -11,9 +11,9 @@ import seaborn as sns
 
 
 def grubbs_remove_outlier(X, alpha):
-    ''' 
-    Run Grubbs’ Test and remove the outlier based on significance level
-    and grubbs value and  grubbs critical value
+     ''' 
+    This function runs Grubbs’ Statistical Test to detect and remove the outlier based on significance level
+    and grubbs value & critical value.
 
     Parameters
     ----------
@@ -60,8 +60,8 @@ def grubbs(X, max_outliers,  alpha=0.05, name=''):
     '''
     Grubbs’ Test is also known as the maximum normalized residual test or extreme studentized deviate test is a test used to detect outliers in a univariate data set assumed to come from a normally distributed population. This test is defined for the hypothesis:
 
-    Ho: There are no outliers in the data set
-    Ha: There is exactly one outlier in the database
+    Ho: There are no outliers in the dataset
+    Ha: There is exactly one outlier in the dataset
 
     Parameters
     ----------
@@ -138,6 +138,10 @@ def detect_outliers(X, factor=1.5):
 
 
 def missing_values_table(df):
+    """
+    Returns a pandas DataFrame containing the counts of missing values by column in the input DataFrame
+
+    """
     mis_val = df.isnull().sum()
     mis_val_percent = 100 * df.isnull().sum() / len(df)
     mis_val_table = pd.concat([mis_val, mis_val_percent], axis=1)
@@ -154,6 +158,10 @@ def missing_values_table(df):
 
 #logic preparation
 def logic_preparation(x_df, no_treatment_columns = [] ):
+    """
+    This function provides a recommendation on how to deal with each feauture's missing values based on the missing values' percentage.
+
+    """
     missing = missing_values_table(x_df).iloc[:,1]
     df_missing = pd.DataFrame(columns=['name', 'missing','treatment' ])
 
@@ -355,6 +363,11 @@ def eval_df(df_o,
      
 
     def get_stat(name): 
+    """
+
+    This function outputs feature statistics such as IQR, min, max, mean, variance, skewness, kurtosis, etc..
+
+    """
         if(name in output['name']):
             return
         
