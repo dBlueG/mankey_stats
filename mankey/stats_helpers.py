@@ -484,6 +484,11 @@ def eval_df(df_o,
 
 
 def clean_data(df_train, df_test):
+     """
+     This function is used to handle outliers and missing data, for outliers, it will clean the outliers in the training and testing datasets 
+     based on the output of eval_df function. For missing values, the function is also used for imputation of missing values by Mean/Median/Mode.
+     
+     """
 
     df_clean = df_train.copy()
     descriptive_statistics, df_treatment_logic, outliers = eval_df(df_clean)
@@ -525,7 +530,7 @@ def clean_data(df_train, df_test):
 
    
 
-    # Outliers Tratment
+    # Outliers Treatment
 
     # impute based if the data is normal or not
     for item in df_clean.columns:
