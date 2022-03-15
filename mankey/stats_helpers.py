@@ -162,14 +162,20 @@ def logic_preparation(x_df, no_treatment_columns = [] ):
 
     """
     missing = missing_values_table(x_df).iloc[:,1]
-    df_missing = pd.DataFrame(columns=['name', 'missing','treatment' ])
+    df_missing = pd.DataFrame(columns=['name', 'missing','treatment', 'comment' ])
 
     df_missing["missing"] = missing.tolist()
     df_missing["name"] = missing.index.values.tolist()    
     df_missing.treatment = "Treat" 
+    df_missing.comment = "Treat missing values based on statistical distribution (mean or median) or mode"
     df_missing.treatment.loc[df_missing["missing"] >= 70] = "Drop" 
     df_missing.treatment.loc[df_missing["missing"] < 5] = "Omit"
-    df_missing.treatment.loc[df_missing["missing"] == 0] = "Do Nothing" 
+    df_missing.treatment.loc[df_missing["missing"] == 0] = "Do Nothing"
+    df_missing.comment.loc[df_missing["missing"] == 0] = "Feature has no missing values"
+    df_missing.comment.loc[df_missing["missing"] >= 70] = "Drop the feature as it is missing more than 70 pecent of the values" 
+    df_missing.comment.loc[df_missing["missing"] < 5] = "Omit observations with this feature missing (less than 5 percent of total records)"
+    df_missing.comment.loc[df_missing["missing"] == 0] = "Feature has no missing values"    
+     
   
     columns_to_drop = []
     columns_to_drop = df_missing.name.loc[df_missing["treatment"] == "Drop"].tolist() 
@@ -180,151 +186,14 @@ def logic_preparation(x_df, no_treatment_columns = [] ):
         if (df_missing.iloc[i]["name"] in no_treatment_columns and
                 df_missing.iloc[i]["treatment"] == "Treat"):
             df_missing.treatment.iloc[i] = "Omit"
-            
-    if (len(columns_to_drop) > 0 ):
-        print("\nColumns to drop are :" )
-        print(*columns_to_drop, sep='\n')
 
     columns_to_omit_missing_values = [] 
     columns_to_omit_missing_values = df_missing.name.loc[df_missing["treatment"] == "Omit"].tolist() 
     columns_to_omit_missing_values = list(dict.fromkeys(columns_to_omit_missing_values)) 
-    
-    if (len(columns_to_omit_missing_values) > 0 ): 
-        print("\ncannot be treated columns is :" )
-        print(*columns_to_omit_missing_values, sep='\n')
-    
+
     
     return df_missing
 
-
-def eval_df_bk(df_o, normal_test_alpha=0.05,
-            grubbs_alpha=0.05,
-            grubbs_max_outliers=20,
-            iqr_factor=2.5
-            ):
-    df = df_o.copy()
-
-    names = []
-    types = []
-    count = []
-    unique = []
-    top = []
-    freq = []
-    mins = []
-    mean = []
-    variance = []
-    skewness = []
-    kurtosis = []
-    maxs = []
-    q1 = []
-    q2 = []
-    q3 = []
-    iqrs = []
-    missing = []
-    missing_prc = []
-    is_normals = []
-    has_outliers = []
-
-    outliers = {}
-
-    df_describe = df.describe(include='all')
-
-    df_missing = missing_values_table(df)
-
-    for item in df.columns:
-        names.append(item)
-        count.append(df_describe[item]['count'])
-        missing.append(df_missing.loc[item]['Missing Values'])
-        missing_prc.append(df_missing.loc[item]['% of Total Values'])
-
-        if is_numeric_dtype(df[item]):
-            types.append('Numerical')
-            num_item_describe = stats.describe(df[item])
-            _q1 = df_describe[item]['25%']
-            _q3 = df_describe[item]['75%']
-            iqr = _q3 - _q1
-
-            _, p = stats.normaltest(df[item])
-
-            is_normal = True
-            if (p < normal_test_alpha):
-                is_normal = False
-                is_normals.append("Non-normal")
-            else:
-                is_normal = True
-                is_normals.append("Normal")
-
-            unique.append(np.nan)
-            top.append(np.nan)
-            freq.append(np.nan)
-            mins.append(df_describe[item]['min'])
-            maxs.append(df_describe[item]['max'])
-            mean.append(df_describe[item]['mean'])
-            q1.append(_q1)
-            q2.append(df_describe[item]['50%'])
-            q3.append(_q3)
-            variance.append(num_item_describe.variance)
-            skewness.append(num_item_describe.skewness)
-            kurtosis.append(num_item_describe.kurtosis)
-            iqrs.append(iqr)
-
-            if (is_normal):
-                _, grubbs_outliers = grubbs(
-                    df[item].dropna(), grubbs_max_outliers, grubbs_alpha, item)
-
-                if len(grubbs_outliers) > 0:
-                    outliers[item] = grubbs_outliers
-            else:
-                iqr_outliers = detect_outliers(df[item], iqr_factor)
-
-                if len(iqr_outliers) > 0:
-                    outliers[item] = iqr_outliers
-
-            if item in outliers:
-                has_outliers.append('True')
-            else:
-                has_outliers.append('False')
-
-        else:
-            types.append('Categorical')
-            unique.append(df_describe[item]['unique'])
-            top.append(df_describe[item]['top'])
-            freq.append(df_describe[item]['freq'])
-            mins.append(np.nan)
-            maxs.append(np.nan)
-            mean.append(np.nan)
-            variance.append(np.nan)
-            skewness.append(np.nan)
-            kurtosis.append(np.nan)
-            q1.append(np.nan)
-            q2.append(np.nan)
-            q3.append(np.nan)
-            iqrs.append(np.nan)
-            is_normals.append(np.nan)
-            has_outliers.append(np.nan)
-    descriptive_statistics = pd.DataFrame({'Name': names,
-                                           'Type': types,
-                                           'Count': count,
-                                           'Unique': unique,
-                                           'Top': top,
-                                           'Freq': freq,
-                                           'Min': mins,
-                                           'Max': maxs,
-                                           'Mean': mean,
-                                           'Variance': variance,
-                                           'Skewness': skewness,
-                                           'Kurtosis': kurtosis,
-                                           '25%': q1,
-                                           '50%': q2,
-                                           '75%': q3,
-                                           'IQR': iqrs,
-                                           '# Missing Values': missing,
-                                           '% Missing Values': missing_prc,
-                                           'Is Normal': is_normals,
-                                           'Has Outliers': has_outliers
-                                           })
-
-    return descriptive_statistics, logic_preparation(df), outliers
 
 
 

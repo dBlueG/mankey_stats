@@ -10,14 +10,15 @@ INSTALL_REQUIRES = [
       'scikit-learn',
       'scipy',
       'plotly',
-      'matplotlib'
+      'matplotlib',
+      'seaborn'
 ]
 
 test_requirements = ['pytest','Sphinx','rinohtype']
   
 setup(
     name="mankey_stats",
-    version="0.0.7",
+    version="0.0.14",
     author="IE GROUP_A",
     author_email="khalid.nass@student.ie.edu",
     description="Clean and transform data for ML binary classification with ease",

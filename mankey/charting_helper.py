@@ -4,6 +4,9 @@ import plotly.figure_factory as ff
 import plotly.graph_objs as gobj
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_datetime64_dtype
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 def plot_categorical(df,col_name,unit = 'Y'):
     """
     This function is used to plot the categorical data in a bar chart for univariate analysis.
@@ -47,6 +50,8 @@ def plot_categorical(df,col_name,unit = 'Y'):
                             plot_bgcolor = '#FFF8EC')
     figure = gobj.Figure( data = data_, layout = layout )
     py.iplot(figure)
+
+
 def plot_numerical(df, col_name):
     """
     This function is used to plot the numerical data in a Histogram for univariate analysis.
@@ -98,6 +103,8 @@ def plot_numerical(df, col_name):
                          )
     figure = gobj.Figure(data = data_, layout = layout)
     py.iplot(figure)
+
+
 def formate_date(df,col,unit = 'Y'):
     """
     This function is used to extract the Year, Month, and Day from the Date column.
@@ -113,6 +120,8 @@ def formate_date(df,col,unit = 'Y'):
         elif unit == 'D':
             formated_date.append(date.day)
     return formated_date
+
+
 def plot_univariate(df, cols = [], force_categorical = []):
     """
     This function will utilize the plot_numerical and plot_categorical functions to plot the univariate analysis based on the column type in the dataframe (categorical/numerical/datetime).
@@ -128,3 +137,36 @@ def plot_univariate(df, cols = [], force_categorical = []):
             plot_numerical(data, col)
         elif (is_object_dtype(df[col])) or (is_datetime64_dtype(df[col])) :
             plot_categorical(data,col)
+
+
+
+def plot_correlation_matrix(df):
+    """
+    This function plots a pearson correlation for numeric attributes
+
+    Parameters
+    ----------
+    df: The dataframe containing the data
+    """
+    corr = df.corr()
+    # Generate a mask for the upper triangle
+    mask = np.zeros_like(corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+
+    # Set up the matplotlib figure
+    f, ax = plt.subplots(figsize=(11, 9))
+
+    # Generate a custom diverging colormap
+    cmap = sns.diverging_palette(220, 10, as_cmap=True)
+
+    
+    # Draw the heatmap with the mask and correct aspect ratio
+    ax = sns.heatmap(corr, mask=mask, cmap=cmap, vmax=1, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .7})
+
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        rotation=45,
+        horizontalalignment='right'
+    );
+

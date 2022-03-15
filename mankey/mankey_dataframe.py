@@ -33,7 +33,7 @@ from sklearn.model_selection import train_test_split
 
 
 from .stats_helpers import eval_df, clean_data
-from .charting_helper import plot_univariate
+from .charting_helper import plot_correlation_matrix, plot_univariate
 from .custom_helpers import WoE_Transformer, Ordinal_Transformer
 
 class MankeyDataFrame(pd.DataFrame):
@@ -101,6 +101,13 @@ class MankeyDataFrame(pd.DataFrame):
     def plot_charts(self, input_vars = [], force_categorical=['BINARIZED_TARGET']):
         plot_univariate(self, cols = input_vars, force_categorical=force_categorical)
     
+
+    def plot_correlation(self, X, y):
+        df = pd.DataFrame(X).copy()
+        df["target"] = y
+        plot_correlation_matrix(df)
+
+
     def explore_stat(self, input_vars=[], normal_test_alpha=0.05, grubbs_alpha=0.05, grubbs_max_outliers=20, iqr_factor=2.5):
         """
         This method describes the each feature of the dataset, for numeric fields, several statistics are 

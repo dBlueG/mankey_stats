@@ -11,9 +11,12 @@ Contents:
 .. include:: modules.rst
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
  
 .. automodule:: custom_helpers
+.. automodule:: mankey_dataframe
+.. automodule:: charting_helper
+.. automodule:: stats_helpers
  
  
 Indices and tables

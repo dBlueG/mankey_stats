@@ -12,6 +12,22 @@ custom\_helpers module
    :undoc-members:
    :show-inheritance:
 
+stats\_helpers module
+-----------------------------
+
+.. automodule:: stats_helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+charting\_helpers module
+-----------------------------
+
+.. automodule:: charting_helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mankey\_dataframe module
 -------------------------------
 
