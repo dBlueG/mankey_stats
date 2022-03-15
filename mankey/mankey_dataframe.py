@@ -21,15 +21,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn import preprocessing
-from sklearn.base import BaseEstimator
-from sklearn.base import TransformerMixin
-from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_transformer
-from sklearn.compose import make_column_selector
-from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import Pipeline
+
 
 from pandas.api.types import is_numeric_dtype, is_object_dtype
 import numpy as np
@@ -38,9 +31,10 @@ import plotly.figure_factory as ff
 import plotly.graph_objs as gobj
 from sklearn.model_selection import train_test_split
 
-import custom_helpers as custom
-import stats_helpers
-import charting_helper
+
+from .stats_helpers import eval_df, clean_data
+from .charting_helper import plot_univariate
+from .custom_helpers import WoE_Transformer, Ordinal_Transformer
 
 class MankeyDataFrame(pd.DataFrame):
     """
@@ -107,7 +101,7 @@ class MankeyDataFrame(pd.DataFrame):
 
 
     def plot_charts(self, input_vars = [], force_categorical=['BINARIZED_TARGET']):
-        charting_helper.plot_univariate(self, cols = input_vars, force_categorical=force_categorical)
+        plot_univariate(self, cols = input_vars, force_categorical=force_categorical)
     
     def explore_stat(self, input_vars=[], normal_test_alpha=0.05, grubbs_alpha=0.05, grubbs_max_outliers=20, iqr_factor=2.5):
         """
@@ -131,7 +125,7 @@ class MankeyDataFrame(pd.DataFrame):
         if(input_vars):
             df_analyze = df_analyze.loc[:,input_vars]
         
-        return stats_helpers.eval_df(df_analyze)
+        return eval_df(df_analyze)
 
     def create_train_test_sets(self, target_var, input_vars = [], test_size = 0.2, random_state = 42):
         """
@@ -188,19 +182,19 @@ class MankeyDataFrame(pd.DataFrame):
 
         if(print_only):
            
-            (descriptive_statistics, logic_prep, _) = stats_helpers.eval_df(df_train)
+            (descriptive_statistics, logic_prep, _) = eval_df(df_train)
             print("Training set")
             print(logic_prep)
             print("===============")
             print(descriptive_statistics)
 
-            (descriptive_statistics, _, _) = stats_helpers.eval_df(df_test)
+            (descriptive_statistics, _, _) = eval_df(df_test)
             print("===============")
             print("Test set stats")
             print(descriptive_statistics)
 
         else:
-            (df_clean, df_clean_test) = stats_helpers.clean_data(df_train, df_test)
+            (df_clean, df_clean_test) = clean_data(df_train, df_test)
             #X_train, y_train, X_test, y_test
             return df_clean.loc[:, df_clean.columns != target_var], df_clean[target_var], \
                    df_clean_test.loc[:, df_clean_test.columns != target_var], df_clean_test[target_var]
@@ -254,7 +248,7 @@ class MankeyDataFrame(pd.DataFrame):
             return
 
         #numeric variables
-        descriptive_statistics, _, _ = stats_helpers.eval_df(X_train)
+        descriptive_statistics, _, _ = eval_df(X_train)
         std_scaler = []
         minmax_scaler = []
         for col in X_train.select_dtypes(include=np.number):
@@ -321,7 +315,7 @@ class MankeyDataFrame(pd.DataFrame):
         if(ordinal_var):
             print("Ordinal variables specificed will be transformed to numeric according to the specified order")
             if(not print_only):
-                ordinal_transformer = custom.Ordinal_Transformer()
+                ordinal_transformer = Ordinal_Transformer()
                 ordinal_transformer.fit( ordinal_var, X_train ,None)
 
                 X_train = ordinal_transformer.transform(X_train, None)
@@ -344,7 +338,7 @@ class MankeyDataFrame(pd.DataFrame):
                 X_train[feature] = X_train[feature].cat.remove_unused_categories()
                 X_test[feature] = X_test[feature].cat.remove_unused_categories()
             
-            t_woe = custom.WoE_Transformer()
+            t_woe = WoE_Transformer()
             
             t_woe.fit(X_train, y_train, target_var, woe_vars,  woe_cat_threshold)
             X_train = t_woe.transform(X_train,y_train)

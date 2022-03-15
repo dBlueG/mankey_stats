@@ -7,7 +7,6 @@ import scipy.stats as stats
 from pandas.api.types import is_object_dtype, is_numeric_dtype
 from scipy import stats
 
-import seaborn as sns
 
 
 def grubbs_remove_outlier(X, alpha):

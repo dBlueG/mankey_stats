@@ -2,7 +2,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OrdinalEncoder
 import pandas as pd
 import numpy as np
-import datetime
 
 
 # Ordinal transformer
