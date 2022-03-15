@@ -22,9 +22,9 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 * Detailed analysis of features, including numerical distibution tests
 * Analysis and handling of outliers and missing data
 * Interactive plotting and data visualization functionality
-* Tranformation options including One hot encoding, ordinal transformations, and weight of evidence
+* Transformation options including One hot encoding, ordinal transformations, and weight of evidence
 * Functionality to prepare date fields for ML models
-* Ability to examine and recommend without modifying the underlying data
+* Ability to examine and recommend changes without modifying the underlying data
 * Optimized logic to ensure fast execution times, using numpy, scipy, and vectorization techniques
 
 ## Analysis of features:
