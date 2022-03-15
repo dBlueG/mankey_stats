@@ -7,6 +7,22 @@ import datetime
 
 # Ordinal transformer
 class Ordinal_Transformer(BaseEstimator, TransformerMixin):
+    """
+    Ordinal transformer takes a dictionary of feature names and the levels of the categories and returns a dataframe with the levels encoded, 
+    this is useful for categorical variables where we need to encode the order based on the user input. In case, the test set does not have the
+    category then the category is not encoded and the test set is not changed.
+
+    Parameters
+    ----------
+    class_order_dict: dictionary of feature names and the levels of the categories
+    X: dataframe
+    y: target variable
+    input_vars: list of feature names containing categorical variables
+
+    Returns
+    -------
+    A new dataframe with the levels encoded
+    """
 
     ord_enc = []
 
@@ -46,6 +62,25 @@ class Ordinal_Transformer(BaseEstimator, TransformerMixin):
 
 # Custom categorical WoE handler
 class WoE_Transformer(BaseEstimator, TransformerMixin):
+      """
+      WoE values for the various categories of a categorical variable can be used to impute a categorical feature 
+      and convert it into a numerical feature as a logistic regression model requires all its features to be numerical.
+    
+      This class will calculate WoE for a given variable 
+
+      Parameters
+      ----------
+
+     input_var: name of the variable to calculate WoE for
+ 
+     class_order_dict: dictionary containing the class order for each variable
+
+     target_var: name of the target variable
+
+     Returns
+     ----------
+     A new dataframe with the WoE values for each category
+     """
     def __init__(self):
         super().__init__()
         self.dict_ = {}
