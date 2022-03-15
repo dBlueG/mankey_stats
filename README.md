@@ -4,8 +4,8 @@
 [![License https://github.com/dBlueG/mankey_stats/blob/main/LICENSE.md](https://img.shields.io/badge/license-MIT-success.svg)](https://github.com/dBlueG/mankey_stats/blob/main/LICENSE.md)
 [![PyPI version](https://badge.fury.io/py/feature-engine.svg)](https://badge.fury.io/py/feature-engine)
 [![Documentation Status https://mankey-stats.readthedocs.io/en/main/genindex.html](https://readthedocs.org/projects/feature-engine/badge/?version=latest)](https://mankey-stats.readthedocs.io/en/main/genindex.html)
-[![Downloads](https://pepy.tech/badge/mankey_stats)](https://pepy.tech/project/mankey_stats)
-[![Downloads](https://pepy.tech/badge/mankey_stats/month)](https://pepy.tech/project/mankey_stats)
+[![PyPI download month](https://img.shields.io/pypi/dm/ansicolortags.svg)](https://pypi.python.org/pypi/mankey_stats/)
+
 
 ![alt text](https://github.com/dBlueG/mankey_stats/blob/main/mankey.png)
 
