@@ -5,7 +5,6 @@
 [![PyPI version fury.io](https://badge.fury.io/py/mankey_stats.svg)](https://pypi.python.org/pypi/mankey_stats/)
 [![Documentation Status https://mankey-stats.readthedocs.io/en/main/genindex.html](https://readthedocs.org/projects/feature-engine/badge/?version=latest)](https://mankey-stats.readthedocs.io/en/main/genindex.html)
 [![PyPI download month](https://img.shields.io/pypi/dm/mankey_stats.svg)](https://pypi.python.org/pypi/mankey_stats/)
-[![PyPI - Downloads](https://img.shields.io/pypi/dd/mankey_stats)](https://pypi.python.org/pypi/mankey_stats/)
 
 
 ![alt text](https://github.com/dBlueG/mankey_stats/blob/main/mankey.png)
