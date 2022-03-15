@@ -15,7 +15,7 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 
 ## Documentation
 
-* [Documentation](https://mankey-stats.readthedocs.io/en/main/#)
+* [Documentation] Generated through sphinx and available in the HTMLDocumentation zip file
 
 ## Primary functionality include:
 
@@ -106,7 +106,7 @@ Out[2]:
 Name: var_A, dtype: int64
 ```
 
-Find more in the [documentation](https://mankey-stats.readthedocs.io/en/main/#).
+[Documentation] Generated through sphinx and available in the HTMLDocumentation zip file.
 
 ### Documentation
 
