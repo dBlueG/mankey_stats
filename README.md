@@ -4,7 +4,7 @@
 [![License https://github.com/dBlueG/mankey_stats/blob/main/LICENSE.md](https://img.shields.io/badge/license-MIT-success.svg)](https://github.com/dBlueG/mankey_stats/blob/main/LICENSE.md)
 [![PyPI version fury.io](https://badge.fury.io/py/mankey-stats.svg)](https://pypi.python.org/pypi/mankey-stats/)
 [![Documentation Status https://mankey-stats.readthedocs.io/en/main/genindex.html](https://readthedocs.org/projects/feature-engine/badge/?version=latest)](https://mankey-stats.readthedocs.io/en/main/genindex.html)
-[![PyPI download month](https://img.shields.io/pypi/dm/mankey-stats.svg)](https://pypi.python.org/pypi/mankey-stats/)
+
 
 
 ![alt text](https://github.com/dBlueG/mankey_stats/blob/main/mankey.png)
@@ -70,6 +70,10 @@ We rely on the proven ML libraries: pandas, Seabor, plotly, numpy, scipy, and Sc
 
 >>> data = {'type':  ['bad', 'average', 'good', 'very good', 'excellent'],
             'level': [1, 2, 3, 4, 5]
+            
+>>> levels_dict = {'type':  ['bad', 'average', 'good', 'very good', 'excellent'],
+                   }
+                   
 >>> data = pd.DataFrame(data)
 >>> print(data)
 ```
@@ -86,9 +90,10 @@ Name: var_A, dtype: int64
 ```
     
 ```python 
->>> ordinal_encoding = Oridnal_encoder()
->>> data_encoded = ordinal_encoding(data)
->>> print(data_encoded)
+    t_ord = transformers.Ordinal_Transformer()
+    t_ord.fit( levels_dict, df,None)
+
+    df = t_ord.transform(df, None)
 ```
 
 ```
