@@ -49,11 +49,8 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 ### Variable Creation:
  * date_expander
 
-### Feature Selection:
- * 
-
 ### Datetime
- * DatetimeFeatures
+ * date_expander
  
 ### Preprocessing
  * MatchVariables
