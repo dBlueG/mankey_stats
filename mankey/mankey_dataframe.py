@@ -38,14 +38,12 @@ from .custom_helpers import WoE_Transformer, Ordinal_Transformer
 
 class MankeyDataFrame(pd.DataFrame):
     """
-    The class is used to extend the properties of Dataframes through providing 
-    statistical based and robust functions. 
+    The class is used to apply various data wrangling operations to Dataframes which includes Scaling and Encoding.
+    In addition, the class provides some statistical based methods and robust functions such as Normality testing, Outlier detection, and Missing Data handling.
     It provides the end user with both general and specific cleaning functions
-    
-    It facilitates the End User to perform some Date Feature Engineering,
-    Scaling, Encoding, etc. to avoid code repetition.
 
-    Example instantiation:
+
+    Below is an example of instantiation of the class:
 
     import pandas as pd
     csv_list = pd.read_csv("list_stuff.csv")
@@ -104,10 +102,10 @@ class MankeyDataFrame(pd.DataFrame):
         plot_univariate(self, cols = input_vars, force_categorical=force_categorical)
     
     def explore_stat(self, input_vars=[], normal_test_alpha=0.05, grubbs_alpha=0.05, grubbs_max_outliers=20, iqr_factor=2.5):
-        """
-        This method describes the dataset per feature, for numeric fields several statistics are 
-        calculated including skew, kurtosis, normality test, missing value, and quartiles.
-        This also includes grubbs test for outliers
+       """
+        This method describes the each feature of the dataset, for numeric fields, several statistics are 
+        calculated including skewness, kurtosis, normality test (based on D'Agostino and Pearson's test), missing values, and quartiles.
+        This also includes Grubbs test for outliers
 
         Parameters
         ----------
@@ -129,7 +127,7 @@ class MankeyDataFrame(pd.DataFrame):
 
     def create_train_test_sets(self, target_var, input_vars = [], test_size = 0.2, random_state = 42):
         """
-        Divide the dataframe into two sets (training and test) to be used to ML models
+        This method divides the dataframe into two datasets (training and test) to be used for ML models
         
         Parameters
         ----------
@@ -159,10 +157,10 @@ class MankeyDataFrame(pd.DataFrame):
     
     def cleaning_missing(self, X_train, y_train, X_test, y_test, target_var, input_vars=[], print_only = True ):
         """
-        Using the statistical tests from the explore_stat method, this method performs handling of 
-        missing data imputation and/or removal of the feature (as per user preferences).
-        The method can be run in simulation mode or active mode, in simulation, only the recommended transformations
-        will be highlighted but the data is not modified.
+        This method is used for missing data imputation and/or removal of the feature/observation (as per user preferences). 
+        This is done using the statistical tests from the explore_stat method, 
+        The method can be run in simulation mode or active mode. In simulation mode, only the recommended transformations
+        will be highlighted but the data is not modified, while in active mode, the recommended transformations will be applied.
         
         Parameters
         ----------
@@ -171,7 +169,7 @@ class MankeyDataFrame(pd.DataFrame):
 
         Returns
         -------
-          A print with the analysis or new clean columns .
+        A print with the analysis or new clean columns .
 
         """
         df_train = X_train.copy()
@@ -206,15 +204,21 @@ class MankeyDataFrame(pd.DataFrame):
     , due_date = "EXPECTED_CLOSE_DATE", start_date = "LOAN_OPEN_DATE", target_var = 'BINARIZED_TARGET'):
         """
         This method can be used to recommend and/or apply transformations including:
-        impute missing values, date manipulations, categorical variable handling (dummy/WoE/ordinal).
+        impute missing values, data manipulation, categorical variable handling.
+        
+        For WoE, this method gets a list of categorical columns and the target variable, it calculates
+        the WoE for each column and each class within it (fit) and then replaces the original value of the category with the WoE, this can be used later to transform
+        the test set. The transformed categorical variable will be a WOE value and it will be treated same as any continuous variable.
+        
+        This method can be used to transform categorical variables using one hot encoding, dummy variable encoding, or ordinal encoding.
 
-        The method needs two sets (training and test) so that all transformation settings are based
-        on the training set but applied on the both sets.
+        The method requires two datasets (training and test), all transformation rules are based
+        on the training set which is then applied on both datasets.
 
-        Note: the method can be used to also print the transformations, without actually outputting new data
+        Note: the method can be used to also print the transformations, without actually generating new data.
        
-        e.g. of specifying ordinal categories
-        dictionary as follows: {"feature_name": [list of all classes IN ORDER from low (1) to high(# of classes)]}
+        Here is an example of specifying ordinal categories for encoding:
+        dictionary is as follows: {"feature_name": [list of all classes IN ORDER from low (1) to high(# of classes)]}
         
         Parameters
         ----------
@@ -227,9 +231,7 @@ class MankeyDataFrame(pd.DataFrame):
         woe_cat_threshold: the number of classes per category to determine whether WoE should be used for transformation
         ordinal_var: dictionary for specifying ordinal categories as follows: {"feature_name": [list of all classes IN ORDER from low (1) to high(# of classes)]}
         print_only: only print an analysis of the findings
-        expand_dates: expand date fields to "all" (year/month/day) or "year" or "month-year"
-        due_date: a date to consider as due date - a new column will be added to represent differece between START_DATE and due date
-        start_date: a date to consider as start date for due in calculation
+
         Returns
         -------
           A print with the analysis or new transformed columns.                

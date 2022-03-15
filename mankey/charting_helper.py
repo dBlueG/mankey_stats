@@ -5,6 +5,11 @@ import plotly.graph_objs as gobj
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_datetime64_dtype
 def plot_categorical(df,col_name,unit = 'Y'):
+    """
+    This function is used to plot the categorical data in a bar chart for univariate analysis.
+    
+    """
+
     data = df
     values_count = pd.DataFrame(data[col_name].value_counts())
     if is_datetime64_dtype(df[col_name]):
@@ -43,6 +48,9 @@ def plot_categorical(df,col_name,unit = 'Y'):
     figure = gobj.Figure( data = data_, layout = layout )
     py.iplot(figure)
 def plot_numerical(df, col_name):
+    """
+    This function is used to plot the numerical data in a Histogram for univariate analysis.
+    """
     data = df
     series = data[col_name]
     smin,smax = series.min(),series.max()
@@ -91,6 +99,9 @@ def plot_numerical(df, col_name):
     figure = gobj.Figure(data = data_, layout = layout)
     py.iplot(figure)
 def formate_date(df,col,unit = 'Y'):
+    """
+    This function is used to extract the Year, Month, and Day from the Date column.
+    """
     import datetime
     formated_date = []
     for value in df[col]:
@@ -103,6 +114,9 @@ def formate_date(df,col,unit = 'Y'):
             formated_date.append(date.day)
     return formated_date
 def plot_univariate(df, cols = [], force_categorical = []):
+    """
+    This function will utilize the plot_numerical and plot_categorical functions to plot the univariate analysis based on the column type in the dataframe (categorical/numerical/datetime).
+    """
     if len(cols) == 0:
         data = df
     else:
