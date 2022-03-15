@@ -28,6 +28,11 @@ mankey\_dataframe module
    :undoc-members:
    :show-inheritance:
 
+.. autoclass:: MankeyDataFrame
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   
 stats\_helpers module
 ----------------------------
 
