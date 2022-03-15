@@ -16,13 +16,13 @@ def test_ordinal_h():
     levels_dict = {"Pclass": ['First_class', 'Second_Class', 'Third_Class'],
                    }
 
-    target_result = {'type':  [0, 1, 2,3],
+    target_result = {'Pclass':  [0, 1, 2,-1],
                      'level': [1, 2, 3,4],
                      }
     target_df = pd.DataFrame(target_result)
 
     t_ord = transformers.Ordinal_Transformer()
-    t_ord.fit( levels_dict, df,None, input_vars=['Pclass'])
+    t_ord.fit( levels_dict, df,None)
 
     df = t_ord.transform(df, None)
     pd.testing.assert_frame_equal(df, target_df)
@@ -45,7 +45,7 @@ def test_ordinal_one():
     target_df = pd.DataFrame(target_result)
 
     t_ord = transformers.Ordinal_Transformer()
-    t_ord.fit( levels_dict, df,None, input_vars=['type'])
+    t_ord.fit( levels_dict, df,None)
 
     df = t_ord.transform(df, None)
     pd.testing.assert_frame_equal(df, target_df)
@@ -76,7 +76,7 @@ def test_ordinal_two():
     expected_df = pd.DataFrame(target_result_test)
 
     t_ord = transformers.Ordinal_Transformer()
-    t_ord.fit( levels_dict, df,None, input_vars=['type'])
+    t_ord.fit( levels_dict, df,None)
 
     df_test = t_ord.transform(df_test, None)
     pd.testing.assert_frame_equal(df_test, expected_df)
@@ -106,7 +106,7 @@ def test_ordinal_three():
     expected_df = pd.DataFrame(target_result_test)
 
     t_ord = transformers.Ordinal_Transformer()
-    t_ord.fit( levels_dict, df,None, input_vars=['type'])
+    t_ord.fit( levels_dict, df,None)
 
     df_test = t_ord.transform(df_test, None)
     pd.testing.assert_frame_equal(df_test, expected_df)
