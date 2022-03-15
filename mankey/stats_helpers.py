@@ -10,7 +10,7 @@ from scipy import stats
 
 
 def grubbs_remove_outlier(X, alpha):
-     ''' 
+    ''' 
     This function runs Grubbs’ Statistical Test to detect and remove the outlier based on significance level
     and grubbs value & critical value.
 
@@ -362,11 +362,11 @@ def eval_df(df_o,
      
 
     def get_stat(name): 
-    """
+        """
 
-    This function outputs feature statistics such as IQR, min, max, mean, variance, skewness, kurtosis, etc..
+        This function outputs feature statistics such as IQR, min, max, mean, variance, skewness, kurtosis, etc..
 
-    """
+        """
         if(name in output['name']):
             return
         
@@ -483,11 +483,11 @@ def eval_df(df_o,
 
 
 def clean_data(df_train, df_test):
-     """
-     This function is used to handle outliers and missing data, for outliers, it will clean the outliers in the training and testing datasets 
-     based on the output of eval_df function. For missing values, the function is also used for imputation of missing values by Mean/Median/Mode.
-     
-     """
+    """
+    This function is used to handle outliers and missing data, for outliers, it will clean the outliers in the training and testing datasets 
+    based on the output of eval_df function. For missing values, the function is also used for imputation of missing values by Mean/Median/Mode.
+    
+    """
 
     df_clean = df_train.copy()
     descriptive_statistics, df_treatment_logic, outliers = eval_df(df_clean)

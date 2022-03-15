@@ -61,25 +61,25 @@ class Ordinal_Transformer(BaseEstimator, TransformerMixin):
 
 # Custom categorical WoE handler
 class WoE_Transformer(BaseEstimator, TransformerMixin):
-      """
-      WoE values for the various categories of a categorical variable can be used to impute a categorical feature 
-      and convert it into a numerical feature as a logistic regression model requires all its features to be numerical.
-    
-      This class will calculate WoE for a given variable 
+    """
+    WoE values for the various categories of a categorical variable can be used to impute a categorical feature 
+    and convert it into a numerical feature as a logistic regression model requires all its features to be numerical.
 
-      Parameters
-      ----------
+    This class will calculate WoE for a given variable 
 
-     input_var: name of the variable to calculate WoE for
- 
-     class_order_dict: dictionary containing the class order for each variable
+    Parameters
+    ----------
 
-     target_var: name of the target variable
+    input_var: name of the variable to calculate WoE for
 
-     Returns
-     ----------
-     A new dataframe with the WoE values for each category
-     """
+    class_order_dict: dictionary containing the class order for each variable
+
+    target_var: name of the target variable
+
+    Returns
+    ----------
+    A new dataframe with the WoE values for each category
+    """
     def __init__(self):
         super().__init__()
         self.dict_ = {}

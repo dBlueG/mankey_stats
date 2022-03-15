@@ -102,7 +102,7 @@ class MankeyDataFrame(pd.DataFrame):
         plot_univariate(self, cols = input_vars, force_categorical=force_categorical)
     
     def explore_stat(self, input_vars=[], normal_test_alpha=0.05, grubbs_alpha=0.05, grubbs_max_outliers=20, iqr_factor=2.5):
-       """
+        """
         This method describes the each feature of the dataset, for numeric fields, several statistics are 
         calculated including skewness, kurtosis, normality test (based on D'Agostino and Pearson's test), missing values, and quartiles.
         This also includes Grubbs test for outliers
