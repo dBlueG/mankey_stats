@@ -229,7 +229,7 @@ class MankeyDataFrame(pd.DataFrame):
         X_test: subset to be used for test
         y_train: target output related to X_train
         y_test: target output related to X_test
-        #target_var: name of the feature containing the ML target (to be used for y)
+        target_var: name of the feature containing the ML target (to be used for y)
         woe_cat_threshold: the number of classes per category to determine whether WoE should be used for transformation
         ordinal_var: dictionary for specifying ordinal categories as follows: {"feature_name": [list of all classes IN ORDER from low (1) to high(# of classes)]}
         print_only: only print an analysis of the findings
@@ -244,7 +244,6 @@ class MankeyDataFrame(pd.DataFrame):
         if(input_vars):
             X_train = X_train[input_vars]
             X_test = X_test[input_vars]
-        #remaining_vars = X_train.columns 
 
         if(X_train.isna().sum().values.sum() > 0 or X_test.isna().sum().values.sum() > 0):
             print("X_train and X_test still have missing values, consider the clean missing method ")
@@ -265,64 +264,68 @@ class MankeyDataFrame(pd.DataFrame):
             else:
                 print(f"Feature {col} will be scaled with a Min Max scaler (since it is NOT normally distributed)")
                 minmax_scaler.append(col)
-        print('debug - TODO')
-        print(std_scaler)
-        print('TODO')
-        if(std_scaler):
-            #scale numeric features (normal)
-            std_scaler_transformer = StandardScaler()
-            std_scaler_transformer.fit(X_train[std_scaler])
-            X_train[std_scaler] = std_scaler_transformer.transform(X_train[std_scaler])
-            X_test[std_scaler] = std_scaler_transformer.transform(X_test[std_scaler])
-        if(minmax_scaler):
-            #scale numeric features (non-normal)
-            minmax_scaler_transformer = MinMaxScaler()
-            minmax_scaler_transformer.fit(X_train[minmax_scaler])
-            X_train[minmax_scaler] = minmax_scaler_transformer.transform(X_train[minmax_scaler])
-            X_test[minmax_scaler] = minmax_scaler_transformer.transform(X_test[minmax_scaler])
+
+        #only change data if we are not running in print_only mode
+        if(not print_only):
+            if(std_scaler):
+                #scale numeric features (normal)
+                std_scaler_transformer = StandardScaler()
+                std_scaler_transformer.fit(X_train[std_scaler])
+                X_train[std_scaler] = std_scaler_transformer.transform(X_train[std_scaler])
+                X_test[std_scaler] = std_scaler_transformer.transform(X_test[std_scaler])
+            if(minmax_scaler):
+                #scale numeric features (non-normal)
+                minmax_scaler_transformer = MinMaxScaler()
+                minmax_scaler_transformer.fit(X_train[minmax_scaler])
+                X_train[minmax_scaler] = minmax_scaler_transformer.transform(X_train[minmax_scaler])
+                X_test[minmax_scaler] = minmax_scaler_transformer.transform(X_test[minmax_scaler])
 
         
 
         # calculate due date - start date
         # only if the the columns exist
         if(due_date in X_train.columns and start_date in X_train.columns):
-            X_train['due_in_days'] = X_train[due_date] - X_train[start_date]
-            X_test['due_in_days'] = X_test[due_date] - X_test[start_date]
-            X_train['due_in_days'] = X_train['due_in_days'].dt.days
-            X_test['due_in_days'] = X_test['due_in_days'].dt.days
+            print(f"Calulate days difference beteen {due_date} and {start_date}")
+            if(not print_only):
+                X_train['due_in_days'] = X_train[due_date] - X_train[start_date]
+                X_test['due_in_days'] = X_test[due_date] - X_test[start_date]
+                X_train['due_in_days'] = X_train['due_in_days'].dt.days
+                X_test['due_in_days'] = X_test['due_in_days'].dt.days
         else:
             print("No due date calculation since columns specified are not in the dataset")
         
-        print(y_train.shape)
-        print(X_train.shape)
+        
         # dates expansion
         for col in X_train.select_dtypes(include=['datetime64[ns]']):
             print(f"Exapnding feature {col} to {expand_dates}")
-            if(expand_dates == 'year' or expand_dates == 'month-year' or expand_dates == 'all'):
-                X_train[col+"_year"] = X_train[col].dt.year
-                X_test[col+"_year"] = X_test[col].dt.year
-            if(expand_dates == 'month-year' or expand_dates == 'all'):
-                X_train[col+"_month"] = X_train[col].dt.month
-                X_test[col+"_month"] = X_test[col].dt.month
-            if(expand_dates == 'all'):
-                X_train[col+"_day"] = X_train[col].dt.day
-                X_test[col+"_day"] = X_test[col].dt.day
+            if(not print_only):
+                if(expand_dates == 'year' or expand_dates == 'month-year' or expand_dates == 'all'):
+                    X_train[col+"_year"] = X_train[col].dt.year
+                    X_test[col+"_year"] = X_test[col].dt.year
+                if(expand_dates == 'month-year' or expand_dates == 'all'):
+                    X_train[col+"_month"] = X_train[col].dt.month
+                    X_test[col+"_month"] = X_test[col].dt.month
+                if(expand_dates == 'all'):
+                    X_train[col+"_day"] = X_train[col].dt.day
+                    X_test[col+"_day"] = X_test[col].dt.day
             
             print(f"Dropping the feature {col} after expansion")
-            X_train.drop(col, axis = 1, inplace = True)
-            X_test.drop(col, axis = 1, inplace = True)
+            if(not print_only):
+                X_train.drop(col, axis = 1, inplace = True)
+                X_test.drop(col, axis = 1, inplace = True)
 
         # categorical
-        print(y_train.shape)
-        print(X_train.shape)        
+                
         #ordinal
-        print("Ordinal variables specificed will be transformed to numeric according to the specified order")
+        
         if(ordinal_var):
-            ordinal_transformer = custom.Ordinal_Transformer()
-            ordinal_transformer.fit( ordinal_var, X_train ,None)
+            print("Ordinal variables specificed will be transformed to numeric according to the specified order")
+            if(not print_only):
+                ordinal_transformer = custom.Ordinal_Transformer()
+                ordinal_transformer.fit( ordinal_var, X_train ,None)
 
-            X_train = ordinal_transformer.transform(X_train, None)
-            X_test = ordinal_transformer.transform(X_test, None)
+                X_train = ordinal_transformer.transform(X_train, None)
+                X_test = ordinal_transformer.transform(X_test, None)
             
         
         #WoE transformations
@@ -340,7 +343,6 @@ class MankeyDataFrame(pd.DataFrame):
             for feature in woe_vars:
                 X_train[feature] = X_train[feature].cat.remove_unused_categories()
                 X_test[feature] = X_test[feature].cat.remove_unused_categories()
-            #(X_train[woe_vars], X_test[woe_vars]) = self.woe_categorical(self, X_train[woe_vars], y_train, X_test[woe_vars], y_test, woe_vars, target_var)
             
             t_woe = custom.WoE_Transformer()
             
@@ -351,19 +353,12 @@ class MankeyDataFrame(pd.DataFrame):
         #remaining - one hot encoding
         
         ohe_vars = [col for col in X_train.columns if not is_numeric_dtype(X_train[col])]
-        print("ohe - begin")
+        print("The following features will be transformed using one-hot-encoding:")
         print(ohe_vars)
     # define the data preparation for the columns
-        if(ohe_vars):
-            """
-            t = [('cat', OneHotEncoder(), ohe_vars)]
-            col_transform = ColumnTransformer(transformers=t)
-            pipeline = Pipeline(steps=[ ('prep',col_transform) ])
-
-            pipeline.fit(X_train, y_train)
-            X_train  = pipeline.transform(X_train)
-            X_test = pipeline.transform(X_test)
-        """
+        if(not print_only and ohe_vars):
+            
+            
             ohe_transformer = preprocessing.OneHotEncoder(sparse=False)
             ohe_transformer.fit(X_train[ohe_vars])
             
@@ -378,43 +373,6 @@ class MankeyDataFrame(pd.DataFrame):
             print("remove remaining Categorical variables after OHE")
             X_train.drop(columns = ohe_vars, axis = 1, inplace = True)
             X_test.drop(columns = ohe_vars, axis = 1, inplace = True)
-        """
         
-        ohe_vars = []e
-        for feature in X_train.select_dtypes(exclude=[np.number]):
-            ohe_vars.append(ohe_vars)
-        
-        for feature in ohe_vars:
-            (X_train_ohe, X_test_ohe) = self.fun_ohe(X_train, X_test, feature)
-            
-            X_train = pd.concat([X_train, X_train_ohe], axis=1).drop([feature], axis=1)
-            X_test = pd.concat([X_test, X_test_ohe], axis=1).drop([feature], axis=1)
-
-        """
         return X_train, X_test
     
-    def woe_categorical(self, X_train, y_train, X_test, y_test, input_vars, target_var, num_cat_threshold = 5):
-        """
-        TODO: This method gets a list of categorical columns and target variable, this calculates
-        the WoE for each column and each class within it (fit), this can be used later to transform
-        the test set
-
-        """
-        
-        
-
-        #return (X_train, X_test)
-        
-
-
-    def fun_ohe(self, X_train_in, X_test_in, variable):
-        print(X_train_in.shape)
-        print(X_test_in.shape)
-        ohe = OneHotEncoder(sparse=False)
-        ohe.fit(X_train_in[[variable]])
-        ohe_train = pd.DataFrame(ohe.transform(X_train_in[[variable]]), columns = ohe.get_feature_names([variable]))
-        ohe_test = pd.DataFrame(ohe.transform(X_test_in[[variable]]), columns = ohe.get_feature_names([variable]))
-
-        ohe_train.set_index(X_train_in.index, inplace=True)
-        ohe_test.set_index(X_test_in.index , inplace=True)
-        return(ohe_train, ohe_test)
