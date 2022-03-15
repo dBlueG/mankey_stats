@@ -7,7 +7,7 @@
 [![Downloads](https://pepy.tech/badge/feature-engine)](https://pepy.tech/project/feature-engine)
 [![Downloads](https://pepy.tech/badge/feature-engine/month)](https://pepy.tech/project/feature-engine)
 
-![alt text](https://www.pngfind.com/pngs/m/607-6079786_056-mankey-mankey-pokemon-hd-png-download.png)
+![alt text](https://github.com/dBlueG/mankey_stats/blob/main/mankey.png)
 
 
 Mankey_stats is a Python library that allows the user to quickly and efficiently perform data preparation techniques to transform the datasets for ML modeling, this is done through the utilization of Scikit-learn's fit() and transform() methods.
@@ -49,11 +49,8 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 ### Variable Creation:
  * date_expander
 
-### Feature Selection:
- * 
-
 ### Datetime
- * DatetimeFeatures
+ * date_expander
  
 ### Preprocessing
  * MatchVariables
@@ -66,13 +63,14 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 From PyPI using pip:
 
 ```
-pip install mankey_stats
+pip install -i https://test.pypi.org/simple/ mankey_stats==0.0.2
 ```
 
 From Anaconda:
 
 ```
-conda install -c conda-forge mankey_stats
+conda install -c conda-forge https://test.pypi.org/simple/ mankey_stats==0.0.2
+
 ```
 
 Or simply clone it:
