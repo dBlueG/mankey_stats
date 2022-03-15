@@ -18,7 +18,7 @@ test_requirements = ['pytest','Sphinx','rinohtype']
   
 setup(
     name="mankey_stats",
-    version="0.0.14",
+    version="0.1.1",
     author="IE GROUP_A",
     author_email="khalid.nass@student.ie.edu",
     description="Clean and transform data for ML binary classification with ease",
