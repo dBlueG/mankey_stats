@@ -63,13 +63,13 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
 From PyPI using pip:
 
 ```
-pip install -i https://test.pypi.org/simple/ mankey_stats==0.0.2
+pip install mankey_stats
 ```
 
 From Anaconda:
 
 ```
-conda install -c conda-forge https://test.pypi.org/simple/ mankey_stats==0.0.2
+conda install -c conda-forge mankey_stats
 
 ```
 
