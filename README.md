@@ -56,7 +56,7 @@ Mankey_stats is a Python library that allows the user to quickly and efficiently
  * MatchVariables
  
 ### Wrappers:
- * SklearnTransformerWrapper
+ * Based on Sklearn Transformers
 
 ## Installation
 
