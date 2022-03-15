@@ -2,10 +2,9 @@
 
 ![PythonVersion](https://img.shields.io/badge/python-3.6%20|3.7%20|%203.8%20|%203.9-success)
 [![License https://github.com/dBlueG/mankey_stats/blob/main/LICENSE.md](https://img.shields.io/badge/license-MIT-success.svg)](https://github.com/dBlueG/mankey_stats/blob/main/LICENSE.md)
-[![PyPI version](https://badge.fury.io/py/mankey_stats.svg)](https://badge.fury.io/py/mankey_stats)
 [![PyPI version fury.io](https://badge.fury.io/py/mankey_stats.svg)](https://pypi.python.org/pypi/mankey_stats/)
 [![Documentation Status https://mankey-stats.readthedocs.io/en/main/genindex.html](https://readthedocs.org/projects/feature-engine/badge/?version=latest)](https://mankey-stats.readthedocs.io/en/main/genindex.html)
-[![PyPI download month](https://img.shields.io/pypi/dm/ansicolortags.svg)](https://pypi.python.org/pypi/mankey_stats/)
+[![PyPI download month](https://img.shields.io/pypi/dm/mankey_stats.svg)](https://pypi.python.org/pypi/mankey_stats/)
 
 
 ![alt text](https://github.com/dBlueG/mankey_stats/blob/main/mankey.png)
