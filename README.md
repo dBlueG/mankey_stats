@@ -80,6 +80,10 @@ git clone https://github.com/mankey_stats/mankey_stats.git
 
 >>> data = {'type':  ['bad', 'average', 'good', 'very good', 'excellent'],
             'level': [1, 2, 3, 4, 5]
+            
+>>> levels_dict = {'type':  ['bad', 'average', 'good', 'very good', 'excellent'],
+                   }
+                   
 >>> data = pd.DataFrame(data)
 >>> print(data)
 ```
@@ -96,9 +100,10 @@ Name: var_A, dtype: int64
 ```
     
 ```python 
->>> ordinal_encoding = Oridnal_encoder()
->>> data_encoded = ordinal_encoding(data)
->>> print(data_encoded)
+    t_ord = transformers.Ordinal_Transformer()
+    t_ord.fit( levels_dict, df,None)
+
+    df = t_ord.transform(df, None)
 ```
 
 ```
@@ -117,9 +122,7 @@ Find more in the [documentation](https://mankey-stats.readthedocs.io/en/main/#).
 
 mankey-stats documentation is built using [Sphinx](https://www.sphinx-doc.org) and is hosted on [Read the Docs](https://readthedocs.org/).
 
-To build the documentation make sure you have the dependencies installed: from the root directory: ``pip install -r docs/requirements.txt``.
-
-Now you can build the docs using: ``sphinx-build -b html docs build``
+To rebuild the documentation, you need to use the `make html` command to re-build the sphinx docs
 
 
 ## License
